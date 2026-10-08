@@ -21,14 +21,16 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       # Install the pinned version from requirements-dev.txt so Dependabot bumps get tested.
-      - name: Install Ruff
-        run: pip install "$(grep '^ruff==' requirements-dev.txt)"
+      - name: Install Ruff and zizmor
+        run: pip install "$(grep '^ruff==' requirements-dev.txt)" "$(grep '^zizmor==' requirements-dev.txt)"
 
       - name: Check formatting
         run: ruff format --check src dashboard scripts tests
@@ -39,12 +41,19 @@ jobs:
       - name: Compile maintained Python modules
         run: python -m compileall -q src dashboard scripts
 
+      - name: Audit workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: zizmor .github/workflows
+
   verified-slice:
     name: Verified prototype tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
@@ -152,6 +161,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
@@ -169,6 +180,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Build the Space image
         run: docker build -t amastan-fraud-shield .
