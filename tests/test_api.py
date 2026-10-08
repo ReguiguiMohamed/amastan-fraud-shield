@@ -5,6 +5,8 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
+from shared.version import __version__
+
 
 class TestHealthEndpoint:
     def test_root_status(self, api_test_client):
@@ -13,7 +15,7 @@ class TestHealthEndpoint:
         data = response.json()
         assert data["status"] == "healthy"
         assert data["routes"]["health"] == "/health/"
-        assert data["version"] == "0.1.0"
+        assert data["version"] == __version__
         assert data["release_channel"] == "prototype"
         assert data["routes"]["docs"] == "/docs"
 
@@ -22,7 +24,7 @@ class TestHealthEndpoint:
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "healthy"
-        assert data["version"] == "0.1.0"
+        assert data["version"] == __version__
 
     def test_prometheus_metrics_exports_verified_slice(self, api_test_client, admin_headers):
         alert = {
@@ -240,7 +242,7 @@ class TestFeedbackEndpoints:
             "analyst_label": "Invalid Label",
         }
         response = api_test_client.post("/api/v1/feedback/", json=feedback, headers=analyst_headers)
-        assert response.status_code == 422  # Validation error
+        assert response.status_code == 422
 
     def test_batch_feedback_all_success(self, api_test_client, admin_headers, analyst_headers):
         alert1 = {

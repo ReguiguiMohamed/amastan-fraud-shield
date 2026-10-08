@@ -3,7 +3,7 @@
   "info": {
     "title": "Tunisian Fraud Detection - Command Center API",
     "description": "Fraud alert review and reporting for Tunisian digital payments",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "paths": {
     "/api/v1/auth/whoami": {
