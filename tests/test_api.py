@@ -779,6 +779,21 @@ class TestEdgeCases:
         response = api_test_client.post("/api/v1/feedback/", json=feedback, headers=analyst_headers)
         assert response.status_code == 422
 
+    # Schemathesis found these values crashing with HTTP 500 before the bounds existed.
+    @pytest.mark.parametrize(
+        "path",
+        [
+            "/api/v1/alerts/high-risk/?limit=-33808549997347401105408",
+            "/api/v1/alerts/review-queue/?limit=-810032884857885123946835534168457216",
+            "/api/v1/alerts/review-queue/?limit=0",
+            "/api/v1/alerts/ctaf-export?days=-34359738368",
+            "/api/v1/alerts/ctaf-export?days=4395181104",
+        ],
+    )
+    def test_out_of_range_query_returns_422(self, api_test_client, admin_headers, path):
+        response = api_test_client.get(path, headers=admin_headers)
+        assert response.status_code == 422
+
     def test_empty_transaction_id_accepted_by_pipeline(self, api_test_client, admin_headers):
         alert = {
             "transaction_id": "",

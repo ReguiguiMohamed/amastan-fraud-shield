@@ -37,7 +37,7 @@ Admin only.
 
 ### `GET /api/v1/alerts/high-risk/`
 
-Returns high-risk alerts.
+Returns high-risk alerts. Optional `limit` runs from 1 to 1000 and defaults to 50.
 
 ### `GET /api/v1/alerts/review-queue/`
 
@@ -45,7 +45,7 @@ Returns alerts waiting for analyst review.
 
 Optional query parameters:
 
-- `limit`
+- `limit`, 1 to 1000, default 100
 - `alert_type`
 - `branch_id`
 
@@ -59,7 +59,7 @@ Exports one reviewed case.
 
 ### `GET /api/v1/alerts/ctaf-export`
 
-Admin only. Exports confirmed cases for a selected time window.
+Admin only. Exports confirmed cases for a selected time window. Optional `days` runs from 1 to 3650 and defaults to 7.
 
 ## Feedback
 

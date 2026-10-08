@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager, contextmanager
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -702,7 +702,9 @@ async def submit_batch_feedback(
 
 @router.get("/alerts/high-risk/")
 async def get_high_risk_alerts(
-    limit: int = 50, branch_id: Optional[str] = None, auth=Depends(require_scopes({"analyst", "admin"}))
+    limit: int = Query(50, ge=1, le=1000),
+    branch_id: Optional[str] = None,
+    auth=Depends(require_scopes({"analyst", "admin"})),
 ):
     """Endpoint to fetch high-risk alerts for the dashboard"""
     try:
@@ -742,7 +744,7 @@ async def get_high_risk_alerts(
 
 @router.get("/alerts/review-queue/")
 async def get_review_queue(
-    limit: int = 100,
+    limit: int = Query(100, ge=1, le=1000),
     alert_type: Optional[str] = None,
     branch_id: Optional[str] = None,
     auth=Depends(require_scopes({"analyst", "admin"})),
@@ -1406,7 +1408,9 @@ async def export_alert(transaction_id: str, auth=Depends(require_scopes({"analys
 
 
 @router.get("/alerts/ctaf-export")
-async def export_ctaf(days: int = 7, branch_id: Optional[str] = None, auth=Depends(require_scopes({"admin"}))):
+async def export_ctaf(
+    days: int = Query(7, ge=1, le=3650), branch_id: Optional[str] = None, auth=Depends(require_scopes({"admin"}))
+):
     """Export confirmed fraud alerts for CTAF reporting."""
     try:
         cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
