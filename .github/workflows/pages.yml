@@ -1,0 +1,50 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "resultscreenshot.png"
+      - "docs/grafana.png"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy the demo site
+    if: github.repository == 'ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Publishes the Pages artifact and proves its origin with an OIDC token.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # resultscreenshot.png is stored in Git LFS.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+          lfs: true
+
+      # The proof screenshots live outside site/ because the README shows them too.
+      - name: Assemble the site
+        run: |
+          mkdir _site
+          cp -r site/. _site/
+          cp resultscreenshot.png docs/grafana.png _site/
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346  # v5.0.1

@@ -3,7 +3,7 @@ name: Failure issues
 # workflow_run gets a writable token. The job reads only run metadata and checks out nothing.
 on:  # zizmor: ignore[dangerous-triggers]
   workflow_run:
-    workflows: [Health check, Deploy to Hugging Face Space, Weekly Security Report]
+    workflows: [Health check, Deploy to Hugging Face Space, Weekly Security Report, Pages]
     types: [completed]
     branches: [main]
 
