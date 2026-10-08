@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5l8 3.4v5.6c0 5-3.4 9.2-8 11-4.6-1.8-8-6-8-11V5.9z' fill='%2314171c'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 :root {
   --top: #ffffff;
@@ -27,6 +27,7 @@
   --crit-wash: #fdeced;
   --lift: 0 1px 2px rgba(20, 23, 28, .04), 0 18px 40px -18px rgba(20, 23, 28, .18);
   --display: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
   --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --ease: cubic-bezier(.2, .8, .2, 1);
   color-scheme: light;
@@ -62,6 +63,13 @@ a { color: inherit; }
 .steps i.now { background: var(--card); box-shadow: 0 0 0 2px var(--accent); }
 .round { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--edge); border-radius: 50%; background: var(--card); color: var(--ink-2); transition: color .2s, transform .2s; }
 .round:hover { color: var(--ink); transform: rotate(-30deg); }
+.home { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.home h1 { margin: 0; font: 400 22px/1 var(--serif); letter-spacing: -.01em; white-space: nowrap; }
+.lead { margin: 0; padding-block: 8px 28px; font: 400 clamp(30px, 3.6vw, 46px)/1.1 var(--serif); letter-spacing: -.015em; text-wrap: balance; }
+.lead em, .title em { color: var(--ink-2); }
+.lead.swap { animation: rise .6s var(--ease); }
+.cap { margin: 0; font: italic 400 21px/1.1 var(--serif); color: var(--ink-2); }
+.title { margin: 0; padding-block: 96px 0; font: 400 clamp(32px, 4vw, 52px)/1.1 var(--serif); letter-spacing: -.015em; text-align: center; text-wrap: balance; }
 
 .stage { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .95fr) minmax(0, 1fr); gap: 20px; padding-block: 8px 20px; }
 .card { background: var(--card); border: 1px solid var(--edge); border-radius: 24px; box-shadow: var(--lift); padding: 24px; animation: rise .7s var(--ease) both; }
@@ -69,7 +77,7 @@ a { color: inherit; }
 .card:nth-child(3) { animation-delay: .16s; }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
 
-.composer { display: grid; grid-template-columns: minmax(0, 1fr) 168px; grid-template-rows: auto auto 1fr; gap: 20px 24px; }
+.composer { display: grid; grid-template-columns: minmax(0, 1fr) 168px; grid-template-rows: auto auto auto 1fr; gap: 20px 24px; }
 .amount { display: flex; align-items: baseline; gap: 2px; font-weight: 500; letter-spacing: -.035em; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .amount .int { font-size: clamp(44px, 4.6vw, 64px); line-height: 1; }
 .amount .dec { font-size: clamp(22px, 2.2vw, 28px); color: var(--ink-2); }
@@ -95,7 +103,7 @@ a { color: inherit; }
 .send:hover { transform: translateY(-2px); }
 .send:active { transform: scale(.94); }
 
-.map { grid-column: 2; grid-row: 1 / 4; margin: 0; display: grid; align-content: start; gap: 8px; }
+.map { grid-column: 2; grid-row: 1 / 5; margin: 0; display: grid; align-content: start; gap: 8px; }
 .map svg { width: 100%; height: auto; stroke: none; cursor: pointer; touch-action: manipulation; }
 .map .g circle { fill: var(--dot); transition: fill .25s, r .25s; }
 .map .g.seen circle { fill: var(--ink); }
@@ -110,6 +118,7 @@ a { color: inherit; }
 .map figcaption { font: 500 12px var(--mono); color: var(--ink-2); text-align: center; }
 
 .judge { display: grid; grid-template-columns: minmax(0, 1fr) 60px; gap: 20px 18px; align-content: start; }
+.judge .cap { grid-column: 1 / -1; }
 .score { grid-column: 1 / -1; font-size: clamp(48px, 5vw, 72px); font-weight: 500; line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums; transition: color .3s; }
 .rules { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; align-content: start; }
 .rule { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 58px; padding: 0 14px; border-radius: 16px; background: var(--wash); transition: background .3s, color .3s; }
@@ -135,6 +144,7 @@ a { color: inherit; }
 .judge.alert .meter { animation: thud .5s var(--ease); }
 @keyframes thud { 30% { transform: translateY(-4px); } }
 
+.feed { display: grid; gap: 20px; align-content: start; }
 .feed ol { display: grid; gap: 6px; align-content: start; max-height: 470px; margin: 0; padding: 0; overflow-y: auto; list-style: none; }
 .skel { height: 64px; border-radius: 16px; background: var(--wash); }
 .skel:nth-child(2) { opacity: .7; }
@@ -179,7 +189,7 @@ a { color: inherit; }
 
 .cue { display: grid; place-items: center; width: 44px; height: 44px; margin: 8px auto 0; border: 1px solid var(--edge); border-radius: 50%; background: var(--card); color: var(--ink-2); }
 
-.flow { display: flex; align-items: flex-start; padding-block: 112px 40px; }
+.flow { display: flex; align-items: flex-start; padding-block: 48px 0; }
 .node { display: grid; justify-items: center; gap: 14px; flex: 0 1 116px; min-width: 76px; text-decoration: none; }
 .tile { position: relative; display: grid; place-items: center; width: 76px; height: 76px; border: 1px solid var(--edge); border-radius: 24px; background: var(--card); box-shadow: var(--lift); transition: transform .25s var(--ease); }
 .tile > svg { width: 30px; height: 30px; stroke-width: 1.5; }
@@ -199,12 +209,12 @@ a { color: inherit; }
 .wire:nth-of-type(5) i { animation-delay: 2s; }
 @keyframes along { to { left: 100%; } }
 
-.auto { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; max-width: 880px; margin-inline: auto; padding-block: 24px 112px; }
+.auto { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; max-width: 880px; margin-inline: auto; padding-block: 48px 0; }
 .mini { display: grid; justify-items: center; gap: 10px; text-decoration: none; }
 .mini .tile { width: 60px; height: 60px; border-radius: 20px; box-shadow: none; }
 .mini .tile > svg { width: 24px; height: 24px; }
 
-.proof { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; padding-block: 0 96px; }
+.proof { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; padding-block: 48px 96px; }
 .proof a { display: block; overflow: hidden; border: 1px solid var(--edge); border-radius: 20px; background: var(--card); box-shadow: var(--lift); transition: transform .3s var(--ease); }
 .proof a:hover { transform: translateY(-4px); }
 .proof img { display: block; width: 100%; height: auto; }
@@ -223,13 +233,15 @@ a { color: inherit; }
   .composer { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
   .map { grid-column: auto; grid-row: auto; width: min(100%, 170px); justify-self: center; }
   .meter { height: 250px; }
-  .flow { flex-direction: column; align-items: stretch; padding-block: 72px 24px; }
+  .flow { flex-direction: column; align-items: stretch; padding-block: 32px 0; }
   .node { grid-template-columns: 76px minmax(0, 1fr); justify-items: start; align-items: center; flex: none; }
   .v { justify-items: start; min-height: 0; text-align: left; }
   .wire { flex: none; width: 1px; height: 28px; min-width: 0; margin: 0 0 0 38px; }
   .wire i { top: -32px; left: -1.5px; width: 4px; height: 32px; background: linear-gradient(180deg, transparent, var(--ink)); animation-name: down; }
   @keyframes down { to { top: 100%; } }
-  .auto { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 16px; padding-block: 24px 72px; }
+  .auto { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 16px; padding-block: 32px 0; }
+  .title { padding-block: 72px 0; }
+  .home h1 { font-size: 19px; }
   .proof { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -273,20 +285,22 @@ a { color: inherit; }
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
 </svg>
 
-<h1 class="sr">Amastan Fraud Shield</h1>
 
 <div class="wrap">
   <header class="top">
-    <a class="brand" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia" aria-label="Source code on GitHub"><svg><use href="#i-shield"/></svg></a>
+    <a class="home" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia"><span class="brand"><svg><use href="#i-shield"/></svg></span><h1>Amastan Fraud Shield</h1></a>
     <div class="guide">
       <div class="steps" id="steps" role="img" aria-label="Guide progress"><i></i><i></i><i></i><i></i><i></i></div>
       <button class="round" id="reset" type="button" aria-label="Start over"><svg><use href="#i-reset"/></svg></button>
     </div>
   </header>
 
+  <p class="lead" id="lead"></p>
+
   <main>
     <section class="stage" aria-label="Interactive demo">
       <div class="card composer">
+        <h2 class="cap">Compose a payment</h2>
         <div class="amount" aria-hidden="true"><span class="int" id="a-int"></span><span class="dec" id="a-dec"></span><span class="cur">TND</span></div>
         <div class="slider">
           <input id="slider" type="range" min="0" max="1000" step="1" aria-label="Amount in Tunisian dinars">
@@ -308,6 +322,7 @@ a { color: inherit; }
       </div>
 
       <div class="card judge" id="judge">
+        <h2 class="cap">Risk score</h2>
         <div class="score" id="score" aria-hidden="true">0.00</div>
         <ul class="rules">
           <li class="rule" data-rule="velocity"><svg><use href="#i-velocity"/></svg><span class="ind"></span><span class="w">0.3</span></li>
@@ -321,12 +336,14 @@ a { color: inherit; }
       </div>
 
       <div class="card feed">
+        <h2 class="cap">Decisions</h2>
         <ol id="feed" aria-label="Payments"></ol>
       </div>
     </section>
 
     <button class="cue" id="cue" type="button" aria-label="Show the delivery pipeline"><svg><use href="#i-down"/></svg></button>
 
+    <h2 class="title" id="to-prod">From commit to <em>production</em></h2>
     <section class="flow" id="flow" aria-label="Delivery pipeline">
       <a class="node" id="n-commit" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/commits/main" aria-label="Latest commit on main"><span class="tile"><svg><use href="#i-commit"/></svg></span><span class="v"></span></a>
       <span class="wire"><i></i></span>
@@ -341,6 +358,7 @@ a { color: inherit; }
       <a class="node" href="#proof-grafana" aria-label="Grafana Cloud"><span class="tile"><svg><use href="#i-chart"/></svg></span><span class="v"></span></a>
     </section>
 
+    <h2 class="title">Kept healthy by <em>automation</em></h2>
     <section class="auto" aria-label="Automation">
       <a class="mini" data-wf="dependabot.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/dependabot.yml" aria-label="Dependabot"><span class="tile"><svg><use href="#i-bot"/></svg><i class="st"></i></span><span class="v"></span></a>
       <a class="mini" data-wf="health-check.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/health-check.yml" aria-label="Health check"><span class="tile"><svg><use href="#i-pulse"/></svg><i class="st"></i></span><span class="v"></span></a>
@@ -350,6 +368,7 @@ a { color: inherit; }
       <a class="mini" data-wf="pages.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/pages.yml" aria-label="Pages"><span class="tile"><svg><use href="#i-globe"/></svg><i class="st"></i></span><span class="v"></span></a>
     </section>
 
+    <h2 class="title">Live <em>evidence</em></h2>
     <section class="proof" aria-label="Screenshots">
       <a id="proof-neon" href="resultscreenshot.png" aria-label="Live health check, alert response and Neon table"><img src="resultscreenshot.png" width="1875" height="2648" loading="lazy" alt="Health check JSON, a stored alert in Swagger and the alert row in Neon"></a>
       <a id="proof-grafana" href="grafana.png" aria-label="Grafana Cloud dashboard"><img src="grafana.png" width="1862" height="2045" loading="lazy" alt="Grafana Cloud dashboard reading the API metrics"></a>
@@ -375,6 +394,14 @@ const SPACE_HOST = "https://mohamedreg-amastan-fraud-shield-api.hf.space";
 const MIN = 10, MAX = 50000, START = 450, TARGET = 2150;
 const RULES = ["velocity", "travel", "high_value", "d17_limit"];
 const ICON = { velocity: "velocity", travel: "travel", high_value: "value", d17_limit: "wallet" };
+const LEAD = [
+  "Send your <em>first payment</em>",
+  "Push a Flouci payment <em>past 2&#8239;000 TND</em>",
+  "Now pay from <em>another governorate</em>",
+  "Keep paying until the score <em>passes 0.5</em>",
+  "Confirm the fraud to start the <em>CTAF clock</em>",
+  "Ten business days to file. <em>Now see it in production</em>",
+];
 const WEIGHT = { velocity: 0.3, travel: 0.3, high_value: 0.2, d17_limit: 0.2 };
 
 // Governorate capitals. The four Grand Tunis capitals sit within 10 km of each other,
@@ -540,6 +567,15 @@ function render() {
     target.classList.add("hint");
   }
   const now = m.indexOf(false);
+  const lead = $("lead"), step = now === -1 ? 5 : now;
+  if (lead.dataset.step !== String(step)) {
+    lead.dataset.step = step;
+    lead.innerHTML = LEAD[step];
+    lead.classList.remove("swap");
+    // Reading layout restarts the fade on every new step.
+    void lead.offsetWidth;
+    lead.classList.add("swap");
+  }
   $("steps").querySelectorAll("i").forEach((dot, i) => {
     dot.className = m[i] ? "done" : i === now ? "now" : "";
   });
@@ -654,7 +690,7 @@ $("m-card").addEventListener("click", () => { state.method = "card"; render(); }
 $("m-flouci").addEventListener("click", () => { state.method = "flouci"; render(); });
 $("send").addEventListener("click", send);
 $("reset").addEventListener("click", () => { fresh(); skeleton(); render(); });
-$("cue").addEventListener("click", () => $("flow").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
+$("cue").addEventListener("click", () => $("to-prod").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
 
 $("n-ewallet").style.setProperty("--at", pos(EWALLET_TND));
 $("n-high").style.setProperty("--at", pos(HIGH_VALUE_TND));
