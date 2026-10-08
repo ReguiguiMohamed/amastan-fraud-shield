@@ -1,8 +1,8 @@
-fastapi==0.115.0
+fastapi==0.141.1
 numpy==1.26.4
 prometheus-client==0.26.0
-psycopg2-binary==2.9.12
-pydantic==2.12.5
-scipy==1.14.0
-sqlalchemy==2.0.35
-uvicorn==0.52.4
+psycopg2-binary==2.9.13
+pydantic==2.13.5
+scipy==1.17.1
+sqlalchemy==2.1.0
+uvicorn==0.53.0
