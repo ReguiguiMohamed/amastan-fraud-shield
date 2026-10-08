@@ -8,10 +8,10 @@ Do not open a public issue for a security problem.
 
 Email `security@amastan.tn` with:
 
-- the affected endpoint;
-- steps to reproduce;
-- expected impact;
-- a suggested fix, if you have one.
+- the affected endpoint
+- steps to reproduce
+- expected impact
+- a suggested fix, if you have one
 
 ## Current Controls
 
@@ -23,8 +23,11 @@ Email `security@amastan.tn` with:
 - SQLAlchemy parameterized queries.
 - Audit records for feedback and model changes.
 - A protected Prometheus endpoint.
-- Bandit in required CI.
-- Weekly pip-audit and Semgrep reports.
+- A Bandit high-severity gate in CI.
+- Schemathesis fuzzing of every API operation against Postgres in CI.
+- zizmor audits of the GitHub workflows in CI.
+- A weekly pip-audit run.
+- Semgrep and Bandit results in GitHub code scanning.
 
 ## Known Limits
 
