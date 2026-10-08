@@ -7,12 +7,16 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Africa/Tunis"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "security"
+    cooldown:
+      default-days: 14
+    # The merge workflow sets automerge or semver-major. Skip Dependabot's default labels.
+    labels: []
+    groups:
+      pip:
+        update-types: ["minor", "patch"]
+    open-pull-requests-limit: 10
     commit-message:
-      prefix: "deps"
+      prefix: "chore"
       include: "scope"
 
   - package-ecosystem: "docker"
@@ -20,9 +24,12 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    labels:
-      - "dependencies"
-      - "docker"
+    labels: []
+    cooldown:
+      default-days: 14
+    groups:
+      docker:
+        update-types: ["minor", "patch"]
     ignore:
       # numpy 1.26 and scipy 1.14 have no wheels for newer Pythons. Move this with pyproject.toml.
       - dependency-name: "python"
@@ -32,5 +39,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    labels:
-      - "ci-cd"
+    labels: []
+    cooldown:
+      default-days: 14
+    groups:
+      github-actions:
+        update-types: ["minor", "patch"]
