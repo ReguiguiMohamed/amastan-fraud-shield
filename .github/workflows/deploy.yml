@@ -11,6 +11,10 @@ on:
       - "Dockerfile"
       - ".env.example"
       - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: hf-deploy
@@ -21,17 +25,12 @@ jobs:
     name: Deploy API to Hugging Face Space
     if: github.repository == 'ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia'
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
-        with:
-          python-version: "3.11"
 
       - name: Push API files to Hugging Face Space
+        id: push
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
@@ -76,3 +75,21 @@ jobs:
 
           echo "Pushing to Hugging Face Space..."
           git push origin main
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # A push only queues the Space build. Wait for it so a broken image fails here.
+      - name: Wait for the Space build
+        if: steps.push.outputs.pushed == 'true'
+        run: |
+          building=0
+          for _ in $(seq 1 90); do
+            sleep 10
+            stage=$(curl -fsS https://huggingface.co/api/spaces/MohamedReg/amastan-fraud-shield-api | jq -r .runtime.stage) || stage=unreachable
+            echo "$stage"
+            case "$stage" in
+              *BUILDING|*APP_STARTING) building=1 ;;
+              RUNNING) [ "$building" = 1 ] && exit 0 ;;
+              *ERROR) [ "$building" = 1 ] && exit 1 ;;
+            esac
+          done
+          exit 1
