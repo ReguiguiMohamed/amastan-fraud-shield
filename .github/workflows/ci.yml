@@ -5,6 +5,10 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 env:
   PYTHON_VERSION: "3.11"
@@ -14,6 +18,7 @@ jobs:
   quality:
     name: Format and static correctness
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
@@ -39,6 +44,7 @@ jobs:
   verified-slice:
     name: Verified prototype tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
@@ -91,6 +97,7 @@ jobs:
   security-gate:
     name: High-severity security gate
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
@@ -103,3 +110,13 @@ jobs:
 
       - name: Fail on high-severity findings
         run: bandit -r src dashboard scripts -lll
+
+  docker-build:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Build the Space image
+        run: docker build -t amastan-fraud-shield .
