@@ -13,7 +13,7 @@ PostgreSQL. The same code uses SQLite locally.
 
 The project is finished and in maintenance mode.
 
-[Release](https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/releases/tag/v0.1.0)
+[Release](https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/releases/latest)
 | [API reference](docs/API_REFERENCE.md)
 | [Deployment](docs/DEPLOYMENT.md)
 | [OpenAPI](docs/openapi.json)
@@ -104,7 +104,21 @@ ruff check src dashboard scripts tests
 bandit -r src dashboard scripts -lll
 ```
 
-CI also regenerates the OpenAPI file and a deterministic backtest artifact.
+## Automation
+
+Dependabot patch and minor updates merge on their own once CI passes. Major
+updates stay open with a `semver-major` label. A failed health check, deploy or
+security scan on `main` opens one issue, and the next green run closes it.
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| [CI](.github/workflows/ci.yml) | Push to `main`, pull request, manual | Ruff, zizmor, tests with 70% coverage, OpenAPI snapshot, backtest artifact, Schemathesis against Postgres, Bandit gate, Docker build |
+| [Deploy](.github/workflows/deploy.yml) | Push to `main` that changes the image, manual | Pushes the API to the Space and waits for the build |
+| [Dependabot](.github/workflows/dependabot.yml) | Dependabot pull request, CI run | Labels updates and merges patch and minor ones after CI passes |
+| [Health check](.github/workflows/health-check.yml) | Daily at 07:17 UTC, manual | Calls `/health/` unless the Space sleeps |
+| [Weekly Security Report](.github/workflows/security-scan.yml) | Mondays at 06:00 UTC, manual | pip-audit, plus Semgrep and Bandit results to code scanning |
+| [Failure issues](.github/workflows/failure-issues.yml) | Health check, deploy or security scan run on `main` | Opens, comments on or closes one issue per workflow |
+| [Release](.github/workflows/release.yml) | `v*` tag | Creates the GitHub release from [CHANGELOG.md](CHANGELOG.md) |
 
 ## Repository
 
@@ -122,11 +136,18 @@ docs/             API, deployment, OpenAPI, Grafana evidence
 
 Before public or production use:
 
-- rotate every token;
-- rehearse schema changes against PostgreSQL;
-- define backups and retention;
-- replace static bearer tokens with managed identity;
-- validate legal and reporting rules with the responsible institution.
+- rotate every token
+- rehearse schema changes against PostgreSQL
+- define backups and retention
+- replace static bearer tokens with managed identity
+- validate legal and reporting rules with the responsible institution
+
+## Credits
+
+- [Ruff](https://github.com/astral-sh/ruff), MIT, by Astral Software.
+- [Schemathesis](https://github.com/schemathesis/schemathesis), MIT, by Dmitry
+  Dygalo.
+- [zizmor](https://github.com/zizmorcore/zizmor), MIT, by William Woodruff.
 
 ## License
 
