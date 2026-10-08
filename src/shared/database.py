@@ -35,7 +35,11 @@ if DATABASE_URL.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
     engine_kwargs = {}
 
-engine = create_engine(DATABASE_URL, connect_args=connect_args, **engine_kwargs)
+# SQLAlchemy 2.1 maps a bare postgresql:// URL to psycopg 3. Neon hands out that form and the image ships psycopg2.
+url = make_url(DATABASE_URL)
+if url.drivername == "postgresql":
+    url = url.set(drivername="postgresql+psycopg2")
+engine = create_engine(url, connect_args=connect_args, **engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
