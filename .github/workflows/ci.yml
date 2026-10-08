@@ -26,17 +26,15 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install quality tools
-        run: pip install black==24.10.0 flake8==7.1.1 isort==5.13.2
+      # Install the pinned version from requirements-dev.txt so Dependabot bumps get tested.
+      - name: Install Ruff
+        run: pip install "$(grep '^ruff==' requirements-dev.txt)"
 
       - name: Check formatting
-        run: black --check src dashboard scripts tests
+        run: ruff format --check src dashboard scripts tests
 
-      - name: Check import ordering
-        run: isort --check-only src dashboard scripts tests
-
-      - name: Check syntax and undefined names
-        run: flake8 src dashboard scripts tests
+      - name: Check imports, syntax and undefined names
+        run: ruff check src dashboard scripts tests
 
       - name: Compile maintained Python modules
         run: python -m compileall -q src dashboard scripts
@@ -106,7 +104,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Bandit
-        run: pip install bandit==1.7.10
+        run: pip install "$(grep '^bandit==' requirements-dev.txt)"
 
       - name: Fail on high-severity findings
         run: bandit -r src dashboard scripts -lll

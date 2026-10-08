@@ -352,7 +352,9 @@ class BacktestEngine:
         issues = []
 
         if r.delta_fp > r.original_fp * 0.1:
-            issues.append(f"False positives increased by {r.delta_fp} ({r.delta_fp/max(r.original_fp,1)*100:.1f}%)")
+            issues.append(
+                f"False positives increased by {r.delta_fp} ({r.delta_fp / max(r.original_fp, 1) * 100:.1f}%)"
+            )
 
         if r.delta_f1 < -0.05:
             issues.append(f"F1 score degraded by {r.delta_f1:.4f}")
@@ -362,7 +364,7 @@ class BacktestEngine:
 
         if r.delta_alert_count > r.original_alert_count * 0.5:
             issues.append(
-                f"Alert volume increased by {r.delta_alert_count} ({r.delta_alert_count/max(r.original_alert_count,1)*100:.1f}%). This may overwhelm analysts"
+                f"Alert volume increased by {r.delta_alert_count} ({r.delta_alert_count / max(r.original_alert_count, 1) * 100:.1f}%). This may overwhelm analysts"
             )
 
         if issues:

@@ -99,9 +99,8 @@ Open `http://localhost:8001/docs`.
 ```powershell
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD = "1"
 python -m pytest tests -q
-black --check src dashboard scripts tests
-isort --check-only src dashboard scripts tests
-flake8 src dashboard scripts tests
+ruff format --check src dashboard scripts tests
+ruff check src dashboard scripts tests
 bandit -r src dashboard scripts -lll
 ```
 
