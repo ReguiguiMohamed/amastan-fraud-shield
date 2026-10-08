@@ -78,7 +78,7 @@ class ForensicAnalyticEngine:
                 "precision": round(precision, 3),
                 "feedback_counts": feedback_counts,
                 "total_feedback": total_labeled,
-                "prob_label_pairs": prob_label_pairs,
+                "prob_label_pairs": [tuple(pair) for pair in prob_label_pairs],
             }
         except Exception:
             logger.exception("Could not read feedback metrics")

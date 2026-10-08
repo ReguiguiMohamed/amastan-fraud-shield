@@ -696,6 +696,26 @@ class TestMonitoringEndpoints:
         assert "precision" in data
         assert "feedback_counts" in data
 
+    def test_feedback_metrics_with_labelled_alert(self, api_test_client, admin_headers, analyst_headers):
+        alert = {
+            "transaction_id": "TXN_METRICS_PAIR",
+            "user_id": "U1",
+            "amount_tnd": 3000.0,
+            "governorate": "Tunis",
+            "payment_method": "Flouci",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "ml_probability": 0.93,
+        }
+        api_test_client.post("/api/v1/alerts/add/", json=alert, headers=admin_headers)
+        feedback = {"transaction_id": "TXN_METRICS_PAIR", "analyst_label": "Confirmed Fraud"}
+        api_test_client.post("/api/v1/feedback/", json=feedback, headers=analyst_headers)
+
+        response = api_test_client.get("/api/v1/metrics/feedback", headers=analyst_headers)
+        assert response.status_code == 200
+        assert response.json()["prob_label_pairs"] == [[0.93, "Confirmed Fraud"]]
+        overview = api_test_client.get("/api/v1/metrics/system-overview", headers=analyst_headers)
+        assert overview.status_code == 200
+
     def test_threshold_analysis_endpoint(self, api_test_client, analyst_headers):
         response = api_test_client.get("/api/v1/metrics/threshold-analysis", headers=analyst_headers)
         assert response.status_code == 200
