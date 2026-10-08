@@ -1,0 +1,78 @@
+name: Dependabot
+
+# pull_request_target and workflow_run get a writable token on Dependabot PRs.
+# No job here checks out or runs PR code.
+on:  # zizmor: ignore[dangerous-triggers]
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  label:
+    name: Label by update type
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Adds labels and a comment to the PR.
+    permissions:
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      PR: ${{ github.event.pull_request.number }}
+    steps:
+      - id: meta
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98  # v3.1.0
+
+      - name: Mark patch and minor updates for merge
+        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+        run: gh pr edit "$PR" --add-label automerge
+
+      - name: Hold major updates
+        if: >-
+          steps.meta.outputs.update-type == 'version-update:semver-major' &&
+          !contains(github.event.pull_request.labels.*.name, 'semver-major')
+        run: |
+          gh pr edit "$PR" --add-label semver-major
+          gh pr comment "$PR" --body "Major update, so it is not merged automatically. Merge it by hand once CI passes and the release notes show nothing that breaks this API."
+
+  merge:
+    name: Merge after CI passes
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      startsWith(github.event.workflow_run.head_branch, 'dependabot/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency: dependabot-merge
+    # contents and pull-requests merge the PR. actions starts CI and deploy on main.
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      BRANCH: ${{ github.event.workflow_run.head_branch }}
+      SHA: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - name: Merge the PR CI tested
+        run: |
+          pr=$(gh pr list --head "$BRANCH" --author app/dependabot --label automerge --json number --jq '.[0].number')
+          if [ -z "$pr" ]; then
+            echo "No open Dependabot PR labelled automerge on $BRANCH."
+            exit 0
+          fi
+          gh pr merge "$pr" --squash --delete-branch --match-head-commit "$SHA"
+          # A merge made with GITHUB_TOKEN starts no push workflows, so start them here.
+          gh workflow run ci.yml --ref main
+          if gh pr diff "$pr" --name-only | grep -qxE 'requirements\.txt|Dockerfile'; then
+            gh workflow run deploy.yml --ref main
+          fi
