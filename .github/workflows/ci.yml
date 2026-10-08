@@ -92,6 +92,60 @@ jobs:
           path: backtest-report.json
           if-no-files-found: warn
 
+  api-fuzz:
+    name: API fuzzing against Postgres
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17.11-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-retries 10
+    env:
+      # The bare postgresql:// form matches the Neon URL on the Space.
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      ADMIN_TOKEN: ci-admin-token
+      ANALYST_TOKEN: ci-analyst-token
+      RATE_LIMIT_REQUESTS: "1000000"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install the API and Schemathesis
+        run: |
+          pip install -r requirements.txt "$(grep '^schemathesis==' requirements-dev.txt)"
+          pip install -e . --no-deps
+
+      - name: Start the API
+        run: uvicorn dashboard.api:app --port 8000 > uvicorn.log 2>&1 &
+
+      # The stateful phase did not finish in local runs, so it is skipped.
+      - name: Fuzz every operation in the OpenAPI schema
+        run: >-
+          st run http://localhost:8000/openapi.json
+          --wait-for-schema 60
+          -H "Authorization: Bearer $ADMIN_TOKEN"
+          --checks not_a_server_error,response_schema_conformance
+          --phases examples,coverage,fuzzing
+          --generation-codec latin-1
+          --max-examples 50
+          --seed 1
+
+      - name: Show the API log
+        if: failure()
+        run: cat uvicorn.log
+
   security-gate:
     name: High-severity security gate
     runs-on: ubuntu-latest
