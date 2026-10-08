@@ -23,6 +23,10 @@ updates:
     labels:
       - "dependencies"
       - "docker"
+    ignore:
+      # numpy 1.26 and scipy 1.14 have no wheels for newer Pythons. Move this with pyproject.toml.
+      - dependency-name: "python"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
