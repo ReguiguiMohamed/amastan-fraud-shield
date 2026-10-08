@@ -1,0 +1,41 @@
+name: Failure issues
+
+# workflow_run gets a writable token. The job reads only run metadata and checks out nothing.
+on:  # zizmor: ignore[dangerous-triggers]
+  workflow_run:
+    workflows: [Health check, Deploy to Hugging Face Space, Weekly Security Report]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    name: Open, update or close the failure issue
+    if: contains(fromJSON('["success", "failure"]'), github.event.workflow_run.conclusion)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency: failure-issues
+    # Opens, comments on and closes one issue per workflow.
+    permissions:
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TITLE: ${{ github.event.workflow_run.name }} failed on main
+      CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+      RUN_URL: ${{ github.event.workflow_run.html_url }}
+    steps:
+      - name: Sync the issue with the run
+        run: |
+          issue=$(gh issue list --state open --json number,title --jq '.[] | select(.title == env.TITLE) | .number' | head -n 1)
+          if [ "$CONCLUSION" = failure ]; then
+            if [ -n "$issue" ]; then
+              gh issue comment "$issue" --body "Failed again: $RUN_URL"
+            else
+              gh issue create --title "$TITLE" --body "Failed: $RUN_URL"
+            fi
+          elif [ -n "$issue" ]; then
+            gh issue close "$issue" --comment "Recovered: $RUN_URL"
+          fi
