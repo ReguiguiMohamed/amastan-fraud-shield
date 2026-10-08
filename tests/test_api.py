@@ -779,6 +779,11 @@ class TestEdgeCases:
         response = api_test_client.post("/api/v1/feedback/", json=feedback, headers=analyst_headers)
         assert response.status_code == 422
 
+    def test_blank_feedback_transaction_id_returns_422(self, api_test_client, analyst_headers):
+        feedback = {"transaction_id": "   ", "analyst_label": "Confirmed Fraud"}
+        response = api_test_client.post("/api/v1/feedback/", json=feedback, headers=analyst_headers)
+        assert response.status_code == 422
+
     # Schemathesis found these values crashing with HTTP 500 before the bounds existed.
     @pytest.mark.parametrize(
         "path",

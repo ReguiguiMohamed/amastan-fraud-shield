@@ -7,14 +7,14 @@ import time as _time
 from collections import defaultdict
 from contextlib import asynccontextmanager, contextmanager
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Literal, Optional
 
 from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from prometheus_client import CONTENT_TYPE_LATEST, CollectorRegistry, Counter, Gauge, Histogram, generate_latest
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, StringConstraints
 from sqlalchemy import text
 
 from compliance.deadlines import ctaf_filing_deadline
@@ -285,25 +285,10 @@ FEATURE_LABELS = {
 
 
 class FeedbackRequest(BaseModel):
-    transaction_id: str
-    analyst_label: str
+    transaction_id: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=256)]
+    analyst_label: Literal["Confirmed Fraud", "False Positive"]
     analyst_comment: Optional[str] = None
     branch_id: Optional[str] = None
-
-    @field_validator("analyst_label")
-    @classmethod
-    def validate_label(cls, v: str) -> str:
-        allowed = {"Confirmed Fraud", "False Positive"}
-        if v not in allowed:
-            raise ValueError(f"analyst_label must be one of {allowed}")
-        return v
-
-    @field_validator("transaction_id")
-    @classmethod
-    def validate_transaction_id(cls, v: str) -> str:
-        if not v or len(v) > 256:
-            raise ValueError("transaction_id must be non-empty and at most 256 characters")
-        return v.strip()
 
 
 class BatchFeedbackRequest(BaseModel):

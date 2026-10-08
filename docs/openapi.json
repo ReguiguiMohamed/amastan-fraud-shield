@@ -924,10 +924,16 @@
         "properties": {
           "transaction_id": {
             "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
             "title": "Transaction Id"
           },
           "analyst_label": {
             "type": "string",
+            "enum": [
+              "Confirmed Fraud",
+              "False Positive"
+            ],
             "title": "Analyst Label"
           },
           "analyst_comment": {
