@@ -104,7 +104,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Bandit
-        run: pip install "$(grep '^bandit==' requirements-dev.txt)"
+        run: pip install "$(grep '^bandit' requirements-dev.txt)"
 
       - name: Fail on high-severity findings
         run: bandit -r src dashboard scripts -lll

@@ -1,5 +1,5 @@
 -r requirements-ci.txt
 
-bandit==1.9.4
+bandit[sarif]==1.9.4
 pip-audit==2.10.1
 ruff==0.16.9
