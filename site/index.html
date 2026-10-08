@@ -46,6 +46,8 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 button { font: inherit; color: inherit; cursor: pointer; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* SVG elements ignore the hidden attribute without this. */
+[hidden] { display: none !important; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .wrap { max-width: 1240px; margin-inline: auto; }
@@ -529,7 +531,7 @@ function render() {
   document.querySelectorAll(".hint").forEach((el) => el.classList.remove("hint"));
   $("ghost").hidden = target !== $("ghost");
   const ping = $("ping");
-  ping.hidden = target !== "map";
+  ping.toggleAttribute("hidden", target !== "map");
   if (target === "map") {
     const [px, py] = at(suggestedGov());
     ping.setAttribute("cx", px);
