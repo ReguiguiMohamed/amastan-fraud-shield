@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Create the GitHub release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Creates the release for the pushed tag.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      # A tag without a matching CHANGELOG.md section fails here.
+      - name: Create the release from CHANGELOG.md
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          awk -v v="${TAG#v}" '/^## /{f = index($0, "## " v " ") == 1; next} f' CHANGELOG.md > notes.md
+          test -s notes.md
+          gh release create "$TAG" --title "$TAG" --notes-file notes.md --verify-tag
