@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amastan Fraud Shield</title>
+<meta name="description" content="Score a payment against the Amastan Fraud Shield rules, review the alert and see the CTAF filing deadline.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5l8 3.4v5.6c0 5-3.4 9.2-8 11-4.6-1.8-8-6-8-11V5.9z' fill='%2314171c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --top: #ffffff;
+  --bottom: #e9ebee;
+  --card: #ffffff;
+  --wash: #f3f4f6;
+  --ink: #14171c;
+  --ink-2: #5b636e;
+  --dot: #c5cbd3;
+  --line: #dde1e6;
+  --edge: rgba(20, 23, 28, .07);
+  --accent: #1f4fd8;
+  --ok: #1a7f4b;
+  --warn: #b7791f;
+  --crit: #d1121f;
+  --crit-wash: #fdeced;
+  --lift: 0 1px 2px rgba(20, 23, 28, .04), 0 18px 40px -18px rgba(20, 23, 28, .18);
+  --display: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { background: var(--bottom); }
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding-inline: 16px;
+  background: linear-gradient(180deg, var(--top) 0%, var(--top) 18%, var(--bottom) 100%);
+  color: var(--ink);
+  font: 15px/1.5 var(--display);
+  -webkit-font-smoothing: antialiased;
+}
+svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1240px; margin-inline: auto; }
+
+.top { display: flex; align-items: center; justify-content: space-between; padding-block: 20px; }
+.brand { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--ink); color: var(--card); }
+.brand svg { width: 22px; height: 22px; }
+.guide { display: flex; align-items: center; gap: 16px; }
+.steps { display: flex; gap: 8px; }
+.steps i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: background .3s, box-shadow .3s; }
+.steps i.done { background: var(--ink); }
+.steps i.now { background: var(--card); box-shadow: 0 0 0 2px var(--accent); }
+.round { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--edge); border-radius: 50%; background: var(--card); color: var(--ink-2); transition: color .2s, transform .2s; }
+.round:hover { color: var(--ink); transform: rotate(-30deg); }
+
+.stage { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .95fr) minmax(0, 1fr); gap: 20px; padding-block: 8px 20px; }
+.card { background: var(--card); border: 1px solid var(--edge); border-radius: 24px; box-shadow: var(--lift); padding: 24px; animation: rise .7s var(--ease) both; }
+.card:nth-child(2) { animation-delay: .08s; }
+.card:nth-child(3) { animation-delay: .16s; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+
+.composer { display: grid; grid-template-columns: minmax(0, 1fr) 168px; grid-template-rows: auto auto 1fr; gap: 20px 24px; }
+.amount { display: flex; align-items: baseline; gap: 2px; font-weight: 500; letter-spacing: -.035em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.amount .int { font-size: clamp(44px, 4.6vw, 64px); line-height: 1; }
+.amount .dec { font-size: clamp(22px, 2.2vw, 28px); color: var(--ink-2); }
+.amount .cur { margin-left: 10px; font: 500 13px var(--mono); letter-spacing: 0; color: var(--ink-2); }
+
+.slider { position: relative; height: 36px; }
+.slider input { position: relative; z-index: 1; width: 100%; height: 36px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; }
+.slider input::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(90deg, var(--ink) var(--p), var(--line) var(--p)); }
+.slider input::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; margin-top: -10px; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--card); box-shadow: 0 3px 8px rgba(20, 23, 28, .18); }
+.slider input::-moz-range-track { height: 4px; border-radius: 4px; background: var(--line); }
+.slider input::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--ink); }
+.slider input::-moz-range-thumb { width: 22px; height: 22px; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--card); }
+.notch { position: absolute; top: 6px; bottom: 6px; width: 2px; border-radius: 2px; background: var(--dot); left: calc(12px + (100% - 24px) * var(--at)); transform: translateX(-50%); transition: background .3s; }
+.notch.past { background: var(--ink); }
+.ghost { position: absolute; z-index: 2; top: 50%; left: calc(12px + (100% - 24px) * var(--at)); width: 18px; height: 18px; padding: 0; border: 2px solid var(--accent); border-radius: 50%; background: var(--card); transform: translate(-50%, -50%); }
+
+.controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; align-self: end; }
+.seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 16px; background: var(--wash); }
+.seg button { display: grid; place-items: center; width: 52px; height: 44px; border: 0; border-radius: 12px; background: transparent; color: var(--ink-2); transition: background .25s, color .25s, box-shadow .25s; }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(20, 23, 28, .08), 0 4px 12px rgba(20, 23, 28, .08); }
+.send { display: grid; place-items: center; width: 68px; height: 68px; border: 0; border-radius: 50%; background: var(--ink); color: var(--card); box-shadow: 0 10px 24px -8px rgba(20, 23, 28, .55); transition: transform .2s var(--ease), box-shadow .2s; }
+.send svg { width: 26px; height: 26px; stroke-width: 2; }
+.send:hover { transform: translateY(-2px); }
+.send:active { transform: scale(.94); }
+
+.map { grid-column: 2; grid-row: 1 / 4; margin: 0; display: grid; align-content: start; gap: 8px; }
+.map svg { width: 100%; height: auto; stroke: none; cursor: pointer; touch-action: manipulation; }
+.map .g circle { fill: var(--dot); transition: fill .25s, r .25s; }
+.map .g.seen circle { fill: var(--ink); }
+.map .g.here circle { fill: var(--ink); r: 5.5; }
+.map .g:focus { outline: none; }
+.map .g:focus-visible circle { stroke: var(--accent); stroke-width: 2; }
+.map .halo { fill: none; stroke: var(--ink); stroke-width: 1; opacity: .25; transition: cx .35s var(--ease), cy .35s var(--ease); }
+.map .trail { fill: none; stroke: var(--ink); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.map .next { fill: none; stroke: var(--ink); stroke-width: 1.2; stroke-dasharray: 3 4; opacity: .6; }
+.map .ping { fill: none; stroke: var(--accent); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: pingdot 1.8s var(--ease) infinite; }
+@keyframes pingdot { 0% { transform: scale(.5); opacity: 1; } 80%, 100% { transform: scale(1.6); opacity: 0; } }
+.map figcaption { font: 500 12px var(--mono); color: var(--ink-2); text-align: center; }
+
+.judge { display: grid; grid-template-columns: minmax(0, 1fr) 60px; gap: 20px 18px; align-content: start; }
+.score { grid-column: 1 / -1; font-size: clamp(48px, 5vw, 72px); font-weight: 500; line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums; transition: color .3s; }
+.rules { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; align-content: start; }
+.rule { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 58px; padding: 0 14px; border-radius: 16px; background: var(--wash); transition: background .3s, color .3s; }
+.rule .w { font: 500 12px var(--mono); color: var(--ink-2); transition: color .3s; }
+.rule.on { background: var(--ink); color: var(--card); }
+.rule.on .w { color: var(--card); }
+.ind { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.ind .s { width: 8px; height: 8px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px currentColor; opacity: .45; }
+.ind .s.f { background: currentColor; opacity: 1; }
+.ind .dv { width: 1.5px; height: 16px; margin-inline: 3px; background: currentColor; opacity: .7; }
+.trk { position: relative; flex: 1; height: 4px; border-radius: 4px; background: color-mix(in srgb, currentColor 18%, transparent); transition: opacity .3s; }
+.trk i { position: absolute; inset: 0 auto 0 0; border-radius: 4px; background: currentColor; transition: width .35s var(--ease); }
+.trk b { position: absolute; top: -6px; bottom: -6px; width: 1.5px; background: currentColor; }
+.trk.off { opacity: .3; }
+
+.meter { position: relative; height: 290px; border-radius: 16px; background: var(--wash); align-self: end; }
+.fill { position: absolute; inset: 6px; }
+.part { position: absolute; left: 0; right: 0; display: grid; place-items: center; overflow: hidden; border-radius: 9px; background: var(--ink); color: var(--card); transition: bottom .45s var(--ease), height .45s var(--ease), background .3s; }
+.part svg { width: 16px; height: 16px; }
+.cut { position: absolute; left: -6px; right: -6px; bottom: 50%; height: 2px; border-radius: 2px; background: var(--ink); }
+.judge.alert .score { color: var(--crit); }
+.judge.alert .part { background: var(--crit); }
+.judge.alert .meter { animation: thud .5s var(--ease); }
+@keyframes thud { 30% { transform: translateY(-4px); } }
+
+.feed ol { display: grid; gap: 6px; align-content: start; max-height: 470px; margin: 0; padding: 0; overflow-y: auto; list-style: none; }
+.skel { height: 64px; border-radius: 16px; background: var(--wash); }
+.skel:nth-child(2) { opacity: .7; }
+.skel:nth-child(3) { opacity: .45; }
+.tx { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; padding: 12px 14px; border-radius: 16px; background: var(--wash); animation: drop .5s var(--ease); transition: opacity .3s, background .3s; }
+@keyframes drop { from { opacity: 0; transform: translateY(-10px); } }
+.tx > svg { color: var(--ok); }
+.tx.alert { background: var(--crit-wash); }
+.tx.alert > svg { color: var(--crit); }
+.tx.cleared { opacity: .5; background: var(--wash); }
+.tx.cleared > svg { color: var(--ink-2); }
+.l1 { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.amt { font-size: 16px; font-weight: 500; }
+.sc { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+.tx.alert .sc { color: var(--crit); }
+.l2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
+.l2 svg { width: 14px; height: 14px; }
+.acts { display: flex; gap: 6px; }
+.act { position: relative; display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--edge); border-radius: 12px; background: var(--card); transition: background .2s, color .2s; }
+.act.flag { color: var(--crit); }
+.act.flag:hover { background: var(--crit); color: var(--card); }
+.act.clear { color: var(--ink-2); }
+.act.clear:hover { background: var(--ink); color: var(--card); }
+.done-mark { color: var(--crit); }
+.tx.cleared .done-mark { color: var(--ink-2); }
+.ctaf { grid-column: 1 / -1; }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; margin-top: 10px; }
+.day { display: grid; place-items: center; height: 24px; border-radius: 6px; background: var(--card); font: 500 10px var(--mono); color: var(--ink-2); }
+.day.wk { background: repeating-linear-gradient(135deg, var(--line) 0 2px, var(--card) 2px 5px); }
+.day.hol { background: repeating-linear-gradient(45deg, var(--dot) 0 2px, var(--card) 2px 5px); color: var(--ink); }
+.day.biz { background: var(--ink); color: var(--card); animation: pop .35s var(--ease) both; animation-delay: calc(var(--i) * 70ms); }
+.day.d0 { box-shadow: inset 0 0 0 1.5px var(--crit); color: var(--crit); }
+.day.end { background: var(--crit); color: var(--card); }
+@keyframes pop { from { opacity: 0; transform: scaleY(.3); } }
+.due { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 8px; font: 500 14px var(--mono); color: var(--crit); }
+.due svg { width: 16px; height: 16px; }
+
+.hint { position: relative; }
+.hint::after { content: ""; position: absolute; inset: -7px; border: 2px solid var(--accent); border-radius: inherit; pointer-events: none; animation: ping 1.8s var(--ease) infinite; }
+.ghost.hint::after { border-radius: 50%; }
+@keyframes ping { 0% { opacity: .95; transform: scale(.9); } 75%, 100% { opacity: 0; transform: scale(1.15); } }
+
+.cue { display: grid; place-items: center; width: 44px; height: 44px; margin: 8px auto 0; border: 1px solid var(--edge); border-radius: 50%; background: var(--card); color: var(--ink-2); }
+
+.flow { display: flex; align-items: flex-start; padding-block: 112px 40px; }
+.node { display: grid; justify-items: center; gap: 14px; flex: 0 1 116px; min-width: 76px; text-decoration: none; }
+.tile { position: relative; display: grid; place-items: center; width: 76px; height: 76px; border: 1px solid var(--edge); border-radius: 24px; background: var(--card); box-shadow: var(--lift); transition: transform .25s var(--ease); }
+.tile > svg { width: 30px; height: 30px; stroke-width: 1.5; }
+.node:hover .tile, .mini:hover .tile { transform: translateY(-4px); }
+.st { position: absolute; top: -6px; right: -6px; display: grid; place-items: center; width: 20px; height: 20px; border: 2.5px solid var(--card); border-radius: 50%; background: var(--dot); color: var(--card); }
+.st svg { width: 10px; height: 10px; stroke-width: 3.2; }
+.st.ok { background: var(--ok); }
+.st.fail { background: var(--crit); }
+.st.run { background: var(--warn); }
+.v { display: grid; justify-items: center; min-height: 40px; font: 500 12px/1.6 var(--mono); color: var(--ink-2); text-align: center; }
+.v b { color: var(--ink); font-weight: 500; }
+.wire { position: relative; flex: 1 1 auto; min-width: 16px; height: 1px; margin-top: 38px; overflow: hidden; background: var(--line); }
+.wire i { position: absolute; top: -1.5px; left: -32px; width: 32px; height: 4px; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--ink)); animation: along 2.6s linear infinite; }
+.wire:nth-of-type(2) i { animation-delay: .5s; }
+.wire:nth-of-type(3) i { animation-delay: 1s; }
+.wire:nth-of-type(4) i { animation-delay: 1.5s; }
+.wire:nth-of-type(5) i { animation-delay: 2s; }
+@keyframes along { to { left: 100%; } }
+
+.auto { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; max-width: 880px; margin-inline: auto; padding-block: 24px 112px; }
+.mini { display: grid; justify-items: center; gap: 10px; text-decoration: none; }
+.mini .tile { width: 60px; height: 60px; border-radius: 20px; box-shadow: none; }
+.mini .tile > svg { width: 24px; height: 24px; }
+
+.proof { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; padding-block: 0 96px; }
+.proof a { display: block; overflow: hidden; border: 1px solid var(--edge); border-radius: 20px; background: var(--card); box-shadow: var(--lift); transition: transform .3s var(--ease); }
+.proof a:hover { transform: translateY(-4px); }
+.proof img { display: block; width: 100%; height: auto; }
+
+.foot { display: flex; justify-content: center; gap: 12px; padding-block: 0 56px; }
+.foot a { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid var(--edge); border-radius: 50%; background: var(--card); color: var(--ink-2); transition: color .2s, transform .2s; }
+.foot a:hover { color: var(--ink); transform: translateY(-2px); }
+
+@media (max-width: 1100px) {
+  .stage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .composer { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+  .card { padding: 20px; border-radius: 20px; }
+  .composer { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .map { grid-column: auto; grid-row: auto; width: min(100%, 170px); justify-self: center; }
+  .meter { height: 250px; }
+  .flow { flex-direction: column; align-items: stretch; padding-block: 72px 24px; }
+  .node { grid-template-columns: 76px minmax(0, 1fr); justify-items: start; align-items: center; flex: none; }
+  .v { justify-items: start; min-height: 0; text-align: left; }
+  .wire { flex: none; width: 1px; height: 28px; min-width: 0; margin: 0 0 0 38px; }
+  .wire i { top: -32px; left: -1.5px; width: 4px; height: 32px; background: linear-gradient(180deg, transparent, var(--ink)); animation-name: down; }
+  @keyframes down { to { top: 100%; } }
+  .auto { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 16px; padding-block: 24px 72px; }
+  .proof { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .hint::after { animation: none !important; opacity: 1; }
+  .map .ping { animation: none !important; }
+  .wire i { display: none; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7.5 3.2v5.3c0 4.6-3.2 8.4-7.5 10-4.3-1.6-7.5-5.4-7.5-10V6.2z"/><path d="M8.8 12.2l2.2 2.2 4.2-4.4"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10h18M7 14.5h3"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 17.5h2M10 9.2a2.8 2.8 0 014 0M8.7 7.4a4.8 4.8 0 016.6 0"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 107.5-7.5 7.8 7.8 0 00-5.6 2.4L4.5 9"/><path d="M4.5 4.5V9H9"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 21V4M6 4h11l-2.2 4L17 12H6"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.3 12.4l2.6 2.6 4.9-5.2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4.2l8.6 15.3H3.4z"/><path d="M12 10v4M12 16.9v.1"/></symbol>
+  <symbol id="i-velocity" viewBox="0 0 24 24"><path d="M13 3L5.5 13.2h5.8L10.5 21 18.5 10.8h-5.8z"/></symbol>
+  <symbol id="i-travel" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.3"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H15a3 3 0 000-6H9a3 3 0 010-6h6.7"/></symbol>
+  <symbol id="i-value" viewBox="0 0 24 24"><path d="M6.5 4h11l3.5 5-9 11L3 9z"/><path d="M3 9h18M9.5 4L12 20M14.5 4L12 20"/></symbol>
+  <symbol id="i-commit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.6"/><path d="M3 12h5.4M15.6 12H21"/></symbol>
+  <symbol id="i-ci" viewBox="0 0 24 24"><path d="M9.5 3h5M10.5 3v5.6L5.3 17.7A2.2 2.2 0 007.2 21h9.6a2.2 2.2 0 001.9-3.3l-5.2-9.1V3"/><path d="M7.6 14.5h8.8"/></symbol>
+  <symbol id="i-deploy" viewBox="0 0 24 24"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5"/><path d="M4.5 14.5v3.5a2 2 0 002 2h11a2 2 0 002-2v-3.5"/></symbol>
+  <symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v13c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-13M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M7.5 15l3.5-4.5 3 3 5-6.5"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 24 24"><rect x="4.5" y="8" width="15" height="11" rx="3.5"/><path d="M12 4.5V8M9.5 12.5v1.5M14.5 12.5v1.5M2.5 13v2M21.5 13v2"/></symbol>
+  <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l2.2-5.5L13.6 18l2.2-6H21"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V7.5a3.5 3.5 0 017 0v3M12 14.5v2"/></symbol>
+  <symbol id="i-issue" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="1.6"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.5 12.2V4.5a1 1 0 011-1h7.7l8.3 8.3a1.5 1.5 0 010 2.1l-6.4 6.4a1.5 1.5 0 01-2.1 0z"/><circle cx="8" cy="8" r="1.4"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.3 2.4 3.4 5.2 3.4 8.5s-1.1 6.1-3.4 8.5c-2.3-2.4-3.4-5.2-3.4-8.5s1.1-6.1 3.4-8.5z"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.5 7l-5 5 5 5M15.5 7l5 5-5 5M13.5 4.5l-3 15"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 18.5V6a2.5 2.5 0 012.5-2.5H19v13H7.5A2.5 2.5 0 005 19a2.5 2.5 0 002.5 2.5H19"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+</svg>
+
+<h1 class="sr">Amastan Fraud Shield</h1>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia" aria-label="Source code on GitHub"><svg><use href="#i-shield"/></svg></a>
+    <div class="guide">
+      <div class="steps" id="steps" role="img" aria-label="Guide progress"><i></i><i></i><i></i><i></i><i></i></div>
+      <button class="round" id="reset" type="button" aria-label="Start over"><svg><use href="#i-reset"/></svg></button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stage" aria-label="Interactive demo">
+      <div class="card composer">
+        <div class="amount" aria-hidden="true"><span class="int" id="a-int"></span><span class="dec" id="a-dec"></span><span class="cur">TND</span></div>
+        <div class="slider">
+          <input id="slider" type="range" min="0" max="1000" step="1" aria-label="Amount in Tunisian dinars">
+          <span class="notch" id="n-ewallet"></span>
+          <span class="notch" id="n-high"></span>
+          <button class="ghost" id="ghost" type="button" hidden aria-label="Set the amount to 2150 TND"></button>
+        </div>
+        <div class="controls">
+          <div class="seg" role="group" aria-label="Payment method">
+            <button id="m-card" type="button" aria-pressed="true" aria-label="Card"><svg><use href="#i-card"/></svg></button>
+            <button id="m-flouci" type="button" aria-pressed="false" aria-label="Flouci wallet"><svg><use href="#i-wallet"/></svg></button>
+          </div>
+          <button class="send" id="send" type="button" aria-label="Send payment"><svg><use href="#i-send"/></svg></button>
+        </div>
+        <figure class="map">
+          <svg id="map" role="group" aria-label="Governorate"></svg>
+          <figcaption id="gov"></figcaption>
+        </figure>
+      </div>
+
+      <div class="card judge" id="judge">
+        <div class="score" id="score" aria-hidden="true">0.00</div>
+        <ul class="rules">
+          <li class="rule" data-rule="velocity"><svg><use href="#i-velocity"/></svg><span class="ind"></span><span class="w">0.3</span></li>
+          <li class="rule" data-rule="travel"><svg><use href="#i-travel"/></svg><span class="ind"></span><span class="w">0.3</span></li>
+          <li class="rule" data-rule="high_value"><svg><use href="#i-value"/></svg><span class="ind"></span><span class="w">0.2</span></li>
+          <li class="rule" data-rule="d17_limit"><svg><use href="#i-wallet"/></svg><span class="ind"></span><span class="w">0.2</span></li>
+        </ul>
+        <div class="meter" aria-hidden="true">
+          <div class="fill" id="fill"><span class="cut"></span></div>
+        </div>
+      </div>
+
+      <div class="card feed">
+        <ol id="feed" aria-label="Payments"></ol>
+      </div>
+    </section>
+
+    <button class="cue" id="cue" type="button" aria-label="Show the delivery pipeline"><svg><use href="#i-down"/></svg></button>
+
+    <section class="flow" id="flow" aria-label="Delivery pipeline">
+      <a class="node" id="n-commit" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/commits/main" aria-label="Latest commit on main"><span class="tile"><svg><use href="#i-commit"/></svg></span><span class="v"></span></a>
+      <span class="wire"><i></i></span>
+      <a class="node" data-wf="ci.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/ci.yml" aria-label="CI"><span class="tile"><svg><use href="#i-ci"/></svg><i class="st"></i></span><span class="v"></span></a>
+      <span class="wire"><i></i></span>
+      <a class="node" data-wf="deploy.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/deploy.yml" aria-label="Deploy to Hugging Face Space"><span class="tile"><svg><use href="#i-deploy"/></svg><i class="st"></i></span><span class="v"></span></a>
+      <span class="wire"><i></i></span>
+      <a class="node" id="n-space" href="https://huggingface.co/spaces/MohamedReg/amastan-fraud-shield-api" aria-label="API on Hugging Face Spaces"><span class="tile"><svg><use href="#i-cube"/></svg><i class="st"></i></span><span class="v"></span></a>
+      <span class="wire"><i></i></span>
+      <a class="node" href="#proof-neon" aria-label="Neon Postgres"><span class="tile"><svg><use href="#i-db"/></svg></span><span class="v"></span></a>
+      <span class="wire"><i></i></span>
+      <a class="node" href="#proof-grafana" aria-label="Grafana Cloud"><span class="tile"><svg><use href="#i-chart"/></svg></span><span class="v"></span></a>
+    </section>
+
+    <section class="auto" aria-label="Automation">
+      <a class="mini" data-wf="dependabot.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/dependabot.yml" aria-label="Dependabot"><span class="tile"><svg><use href="#i-bot"/></svg><i class="st"></i></span><span class="v"></span></a>
+      <a class="mini" data-wf="health-check.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/health-check.yml" aria-label="Health check"><span class="tile"><svg><use href="#i-pulse"/></svg><i class="st"></i></span><span class="v"></span></a>
+      <a class="mini" data-wf="security-scan.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/security-scan.yml" aria-label="Weekly security report"><span class="tile"><svg><use href="#i-lock"/></svg><i class="st"></i></span><span class="v"></span></a>
+      <a class="mini" data-wf="failure-issues.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/failure-issues.yml" aria-label="Failure issues"><span class="tile"><svg><use href="#i-issue"/></svg><i class="st"></i></span><span class="v"></span></a>
+      <a class="mini" data-wf="release.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/release.yml" aria-label="Release"><span class="tile"><svg><use href="#i-tag"/></svg><i class="st"></i></span><span class="v"></span></a>
+      <a class="mini" data-wf="pages.yml" href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/actions/workflows/pages.yml" aria-label="Pages"><span class="tile"><svg><use href="#i-globe"/></svg><i class="st"></i></span><span class="v"></span></a>
+    </section>
+
+    <section class="proof" aria-label="Screenshots">
+      <a id="proof-neon" href="resultscreenshot.png" aria-label="Live health check, alert response and Neon table"><img src="resultscreenshot.png" width="1875" height="2648" loading="lazy" alt="Health check JSON, a stored alert in Swagger and the alert row in Neon"></a>
+      <a id="proof-grafana" href="grafana.png" aria-label="Grafana Cloud dashboard"><img src="grafana.png" width="1862" height="2045" loading="lazy" alt="Grafana Cloud dashboard reading the API metrics"></a>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <a href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia" aria-label="Source code"><svg><use href="#i-code"/></svg></a>
+    <a href="https://huggingface.co/spaces/MohamedReg/amastan-fraud-shield-api" aria-label="Hugging Face Space"><svg><use href="#i-cube"/></svg></a>
+    <a href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/blob/main/docs/API_REFERENCE.md" aria-label="API reference"><svg><use href="#i-book"/></svg></a>
+    <a href="https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/releases/latest" aria-label="Latest release"><svg><use href="#i-tag"/></svg></a>
+  </footer>
+</div>
+
+<p class="sr" id="live" aria-live="polite"></p>
+
+<script type="module">
+import { score, deadline, isDayOff, EWALLET_TND, HIGH_VALUE_TND, VELOCITY, TRAVEL, FILING_DAYS } from "./rules.js";
+
+const REPO = "ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia";
+const SPACE_API = "https://huggingface.co/api/spaces/MohamedReg/amastan-fraud-shield-api";
+const SPACE_HOST = "https://mohamedreg-amastan-fraud-shield-api.hf.space";
+const MIN = 10, MAX = 50000, START = 450, TARGET = 2150;
+const RULES = ["velocity", "travel", "high_value", "d17_limit"];
+const ICON = { velocity: "velocity", travel: "travel", high_value: "value", d17_limit: "wallet" };
+const WEIGHT = { velocity: 0.3, travel: 0.3, high_value: 0.2, d17_limit: 0.2 };
+
+// Governorate capitals. The four Grand Tunis capitals sit within 10 km of each other,
+// so they are fanned out a little to stay tappable.
+const GOVS = [
+  ["Bizerte", 37.27, 9.87], ["Ariana", 36.99, 10.15], ["Tunis", 36.81, 10.31], ["Manouba", 36.84, 9.95],
+  ["Ben Arous", 36.65, 10.29], ["Nabeul", 36.45, 10.74], ["Zaghouan", 36.40, 10.14], ["Béja", 36.73, 9.18],
+  ["Jendouba", 36.50, 8.78], ["Le Kef", 36.17, 8.70], ["Siliana", 36.08, 9.37], ["Sousse", 35.83, 10.64],
+  ["Monastir", 35.78, 10.83], ["Mahdia", 35.50, 11.06], ["Kairouan", 35.68, 10.10], ["Kasserine", 35.17, 8.83],
+  ["Sidi Bouzid", 35.04, 9.48], ["Sfax", 34.74, 10.76], ["Gafsa", 34.42, 8.78], ["Tozeur", 33.92, 8.13],
+  ["Kébili", 33.70, 8.97], ["Gabès", 33.88, 10.10], ["Médenine", 33.35, 10.50], ["Tataouine", 32.93, 10.45],
+];
+const xy = (lat, lon) => [((lon - 7.8) * 0.82 * 60), ((37.5 - lat) * 60)];
+
+const $ = (id) => document.getElementById(id);
+const icon = (name) => `<svg><use href="#i-${name}"/></svg>`;
+const pos = (amount) => Math.log(amount / MIN) / Math.log(MAX / MIN);
+const nice = (a) => { const step = a < 100 ? 1 : a < 1000 ? 5 : a < 10000 ? 50 : 250; return Math.round(a / step) * step; };
+const group = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+const tnd = (a) => `${group(Math.trunc(a))}.${String(Math.round((a % 1) * 1000)).padStart(3, "0")}`;
+const hms = (d) => d.toTimeString().slice(0, 8);
+const iso = (d) => d.toISOString().slice(0, 10);
+
+let state;
+function fresh() {
+  state = { amount: START, method: "card", gov: "Tunis", txs: [] };
+}
+
+function preview() {
+  const v_count = state.txs.length + 1;
+  const g_dist = new Set([...state.txs.map((t) => t.gov), state.gov]).size;
+  return { v_count, g_dist, ...score({ amount: state.amount, method: state.method, v_count, g_dist }) };
+}
+
+function milestones() {
+  const t = state.txs;
+  return [
+    t.length > 0,
+    t.some((x) => x.res.hits.d17_limit),
+    t.some((x) => x.res.hits.travel),
+    t.some((x) => x.res.alert),
+    t.some((x) => x.label),
+  ];
+}
+
+function suggestedGov() {
+  const seen = new Set([...state.txs.map((t) => t.gov), state.gov]);
+  return ["Sfax", "Sousse", "Gabès"].find((g) => !seen.has(g));
+}
+
+function hintTarget(m, p) {
+  if (!m[0]) return $("send");
+  if (!m[1]) {
+    if (state.amount <= EWALLET_TND) return $("ghost");
+    if (state.method !== "flouci") return $("m-flouci");
+    return $("send");
+  }
+  if (!m[2]) return p.g_dist > TRAVEL ? $("send") : "map";
+  if (!m[3]) return $("send");
+  if (!m[4]) return document.querySelector(".tx.alert:not(.labelled) .flag");
+  return $("cue");
+}
+
+// Map
+const map = $("map");
+function drawMap() {
+  const pts = GOVS.map(([, lat, lon]) => xy(lat, lon));
+  const w = Math.max(...pts.map((p) => p[0])) + 14, h = Math.max(...pts.map((p) => p[1])) + 14;
+  map.setAttribute("viewBox", `0 0 ${w.toFixed(0)} ${h.toFixed(0)}`);
+  map.innerHTML = `<path class="trail" id="trail"/><path class="next" id="next"/><circle class="halo" id="halo" r="10"/>`
+    + GOVS.map(([name], i) => `<g class="g" tabindex="0" role="button" aria-label="${name}" data-gov="${name}"><circle cx="${pts[i][0].toFixed(1)}" cy="${pts[i][1].toFixed(1)}" r="3.5"/></g>`).join("")
+    + `<circle class="ping" id="ping" r="9" hidden/>`;
+}
+const at = (name) => { const g = GOVS.find((x) => x[0] === name); return xy(g[1], g[2]); };
+function pick(name) { if (name && name !== state.gov) { state.gov = name; render(); } }
+map.addEventListener("click", (e) => {
+  const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(map.getScreenCTM().inverse());
+  let best = null, bestD = 18;
+  for (const [name, lat, lon] of GOVS) {
+    const [x, y] = xy(lat, lon), d = Math.hypot(x - pt.x, y - pt.y);
+    if (d < bestD) { best = name; bestD = d; }
+  }
+  pick(best);
+});
+map.addEventListener("keydown", (e) => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.dataset.gov) { e.preventDefault(); pick(e.target.dataset.gov); }
+});
+
+// Rule indicators
+function slots(n, limit) {
+  let html = "";
+  const total = Math.min(Math.max(n, limit + 1), 8);
+  for (let i = 1; i <= total; i++) {
+    html += `<i class="s${i <= n ? " f" : ""}"></i>`;
+    if (i === limit) html += `<b class="dv"></b>`;
+  }
+  return html;
+}
+const track = (amount, limit, active) => `<span class="trk${active ? "" : " off"}"><i style="width:${(pos(amount) * 100).toFixed(1)}%"></i><b style="left:${(pos(limit) * 100).toFixed(1)}%"></b></span>`;
+
+function render() {
+  const p = preview();
+  const m = milestones();
+
+  const [int, dec] = tnd(state.amount).split(".");
+  $("a-int").textContent = int;
+  $("a-dec").textContent = `.${dec}`;
+  const slider = $("slider");
+  slider.value = Math.round(pos(state.amount) * 1000);
+  slider.style.setProperty("--p", `${(pos(state.amount) * 100).toFixed(2)}%`);
+  slider.setAttribute("aria-valuetext", `${tnd(state.amount)} TND`);
+  $("n-ewallet").classList.toggle("past", state.amount > EWALLET_TND);
+  $("n-high").classList.toggle("past", state.amount > HIGH_VALUE_TND);
+  $("m-card").setAttribute("aria-pressed", state.method === "card");
+  $("m-flouci").setAttribute("aria-pressed", state.method === "flouci");
+
+  const visits = [...state.txs.map((t) => t.gov)].filter((g, i, a) => g !== a[i - 1]);
+  const seen = new Set(visits);
+  map.querySelectorAll(".g").forEach((g) => {
+    g.classList.toggle("seen", seen.has(g.dataset.gov));
+    g.classList.toggle("here", g.dataset.gov === state.gov);
+  });
+  const line = (names) => names.map((n, i) => `${i ? "L" : "M"}${at(n).map((v) => v.toFixed(1)).join(" ")}`).join("");
+  $("trail").setAttribute("d", visits.length > 1 ? line(visits) : "");
+  const last = visits[visits.length - 1];
+  $("next").setAttribute("d", last && last !== state.gov ? line([last, state.gov]) : "");
+  const [hx, hy] = at(state.gov);
+  $("halo").setAttribute("cx", hx);
+  $("halo").setAttribute("cy", hy);
+  $("gov").textContent = state.gov;
+
+  document.querySelectorAll(".rule").forEach((li) => {
+    const rule = li.dataset.rule;
+    li.classList.toggle("on", p.hits[rule]);
+    const ind = li.querySelector(".ind");
+    if (rule === "velocity") ind.innerHTML = slots(p.v_count, VELOCITY);
+    if (rule === "travel") ind.innerHTML = slots(p.g_dist, TRAVEL);
+    if (rule === "high_value") ind.innerHTML = track(state.amount, HIGH_VALUE_TND, true);
+    if (rule === "d17_limit") ind.innerHTML = track(state.amount, EWALLET_TND, state.method === "flouci");
+  });
+
+  $("score").textContent = p.total.toFixed(2);
+  $("judge").classList.toggle("alert", p.alert);
+  let bottom = 0;
+  for (const rule of RULES) {
+    const part = $(`part-${rule}`);
+    const h = p.hits[rule] ? WEIGHT[rule] : 0;
+    part.style.bottom = `${bottom * 100}%`;
+    part.style.height = h ? `calc(${h * 100}% - 3px)` : "0";
+    bottom += h;
+  }
+
+  const target = hintTarget(m, p);
+  document.querySelectorAll(".hint").forEach((el) => el.classList.remove("hint"));
+  $("ghost").hidden = target !== $("ghost");
+  const ping = $("ping");
+  ping.hidden = target !== "map";
+  if (target === "map") {
+    const [px, py] = at(suggestedGov());
+    ping.setAttribute("cx", px);
+    ping.setAttribute("cy", py);
+  } else if (target) {
+    target.classList.add("hint");
+  }
+  const now = m.indexOf(false);
+  $("steps").querySelectorAll("i").forEach((dot, i) => {
+    dot.className = m[i] ? "done" : i === now ? "now" : "";
+  });
+  $("steps").setAttribute("aria-label", `Guide step ${Math.min(now === -1 ? 5 : now + 1, 5)} of 5`);
+}
+
+function buildMeter() {
+  $("fill").insertAdjacentHTML("afterbegin", RULES.map((r) => `<span class="part" id="part-${r}">${icon(ICON[r])}</span>`).join(""));
+}
+
+function skeleton() {
+  $("feed").innerHTML = `<li class="skel"></li><li class="skel"></li><li class="skel"></li>`;
+}
+
+function send() {
+  const p = preview();
+  const tx = { at: new Date(), amount: state.amount, method: state.method, gov: state.gov, res: p, label: null };
+  state.txs.push(tx);
+  const feed = $("feed");
+  feed.querySelectorAll(".skel").forEach((s) => s.remove());
+  const li = document.createElement("li");
+  li.className = `tx${p.alert ? " alert" : ""}`;
+  const hits = RULES.filter((r) => p.hits[r]).map((r) => icon(ICON[r])).join("");
+  li.innerHTML = `${icon(p.alert ? "alert" : "ok")}
+    <div><div class="l1"><span class="amt mono">${tnd(tx.amount)}</span><span class="sc mono">${p.total.toFixed(2)}</span></div>
+    <div class="l2 mono"><time datetime="${tx.at.toISOString()}">${hms(tx.at)}</time>${icon(tx.method === "flouci" ? "wallet" : "card")}<span>${tx.gov}</span>${hits}</div></div>
+    <div class="acts">${p.alert ? `<button class="act flag" type="button" aria-label="Confirm fraud">${icon("flag")}</button><button class="act clear" type="button" aria-label="Mark as false positive">${icon("check")}</button>` : ""}</div>`;
+  li.querySelector(".flag")?.addEventListener("click", () => label(tx, li, "Confirmed Fraud"));
+  li.querySelector(".clear")?.addEventListener("click", () => label(tx, li, "False Positive"));
+  feed.prepend(li);
+  feed.scrollTop = 0;
+  $("live").textContent = `${tnd(tx.amount)} TND scored ${p.total.toFixed(2)}${p.alert ? ", alert raised" : ", approved"}.`;
+  render();
+}
+
+function label(tx, li, value) {
+  tx.label = value;
+  li.classList.add("labelled");
+  const fraud = value === "Confirmed Fraud";
+  li.classList.toggle("cleared", !fraud);
+  li.querySelector(".acts").innerHTML = `<span class="done-mark">${icon(fraud ? "flag" : "check")}</span>`;
+  if (fraud) {
+    // The API starts the CTAF clock at detection time, as compliance.deadlines does.
+    const start = new Date(Date.UTC(tx.at.getFullYear(), tx.at.getMonth(), tx.at.getDate()));
+    const end = deadline(start, FILING_DAYS);
+    // Monday-first weeks, so weekends line up in the last two columns.
+    const lead = (start.getUTCDay() + 6) % 7;
+    let cells = "", n = 0;
+    for (const d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
+      const first = d.getTime() === start.getTime(), last = d.getTime() === end.getTime();
+      const off = !first && isDayOff(d), weekend = d.getUTCDay() % 6 === 0;
+      const kind = first ? "d0" : last ? "end" : off ? (weekend ? "wk" : "hol") : "biz";
+      cells += `<span class="day ${kind}" style="--i:${off || first ? n : ++n}${first ? `;grid-column-start:${lead + 1}` : ""}">${d.getUTCDate()}</span>`;
+    }
+    li.insertAdjacentHTML("beforeend", `<div class="ctaf"><div class="days" aria-hidden="true">${cells}</div><div class="due">${icon("clock")}<time datetime="${iso(end)}">${iso(end)}</time></div></div>`);
+    $("live").textContent = `Confirmed fraud. CTAF filing due ${iso(end)}.`;
+  } else {
+    $("live").textContent = "Marked as false positive.";
+  }
+  render();
+}
+
+// Live pipeline status, read without credentials and without waking a sleeping Space.
+const ago = (when) => {
+  const s = (Date.now() - Date.parse(when)) / 1000;
+  return s < 3600 ? `${Math.max(1, Math.round(s / 60))} min` : s < 172800 ? `${Math.round(s / 3600)} h` : `${Math.round(s / 86400)} d`;
+};
+const json = (url) => fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(r.status)));
+function setStatus(el, kind) {
+  const st = el.querySelector(".st");
+  if (!st) return;
+  st.className = `st ${kind}`;
+  st.innerHTML = kind === "ok" ? icon("check") : kind === "fail" ? icon("x") : "";
+}
+
+async function live() {
+  const [runs, space] = await Promise.allSettled([
+    json(`https://api.github.com/repos/${REPO}/actions/runs?per_page=100`),
+    json(SPACE_API),
+  ]);
+  if (runs.status === "fulfilled") {
+    const list = runs.value.workflow_runs.filter((r) => r.conclusion !== "skipped");
+    document.querySelectorAll("[data-wf]").forEach((el) => {
+      const run = list.find((r) => r.path.endsWith(`/${el.dataset.wf}`));
+      if (!run) return;
+      el.href = run.html_url;
+      setStatus(el, run.status !== "completed" ? "run" : run.conclusion === "success" ? "ok" : "fail");
+      el.querySelector(".v").innerHTML = `<b>${ago(run.created_at)}</b>`;
+    });
+    const head = list.find((r) => r.path.endsWith("/ci.yml") && r.head_branch === "main");
+    if (head) {
+      const node = $("n-commit");
+      node.href = `https://github.com/${REPO}/commit/${head.head_sha}`;
+      node.querySelector(".v").innerHTML = `<b>${head.head_sha.slice(0, 7)}</b>`;
+    }
+  }
+  if (space.status === "fulfilled") {
+    const stage = space.value.runtime?.stage ?? "";
+    const node = $("n-space");
+    setStatus(node, stage === "RUNNING" ? "ok" : /ERROR/.test(stage) ? "fail" : /BUILD|START/.test(stage) ? "run" : "");
+    node.querySelector(".v").innerHTML = `<b>${stage}</b>`;
+    if (stage === "RUNNING") {
+      const health = await json(`${SPACE_HOST}/health/`).catch(() => null);
+      if (health?.version) node.querySelector(".v").innerHTML = `<b>${stage}</b><span>v${health.version}</span>`;
+    }
+  }
+}
+
+$("slider").addEventListener("input", (e) => { state.amount = nice(MIN * (MAX / MIN) ** (e.target.value / 1000)); render(); });
+$("ghost").addEventListener("click", () => { state.amount = TARGET; render(); });
+$("m-card").addEventListener("click", () => { state.method = "card"; render(); });
+$("m-flouci").addEventListener("click", () => { state.method = "flouci"; render(); });
+$("send").addEventListener("click", send);
+$("reset").addEventListener("click", () => { fresh(); skeleton(); render(); });
+$("cue").addEventListener("click", () => $("flow").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
+
+$("n-ewallet").style.setProperty("--at", pos(EWALLET_TND));
+$("n-high").style.setProperty("--at", pos(HIGH_VALUE_TND));
+$("ghost").style.setProperty("--at", pos(TARGET));
+fresh();
+drawMap();
+buildMeter();
+skeleton();
+render();
+live();
+</script>
+</body>
+</html>
