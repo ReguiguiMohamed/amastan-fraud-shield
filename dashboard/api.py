@@ -511,7 +511,11 @@ async def rate_limit_middleware(request: Request, call_next):
 # ---------------------------------------------------------------------------
 # API Router (all business endpoints under /api/v1/)
 # ---------------------------------------------------------------------------
-router = APIRouter(prefix="/api/v1", tags=["v1"])
+router = APIRouter(
+    prefix="/api/v1",
+    tags=["v1"],
+    responses={401: {"description": "Missing or unknown token"}, 403: {"description": "Token lacks the required role"}},
+)
 
 
 @router.get("/auth/whoami")
@@ -1262,7 +1266,7 @@ async def get_model_performance(branch_id: Optional[str] = None, auth=Depends(re
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/alerts/{transaction_id}/explain")
+@router.get("/alerts/{transaction_id}/explain", responses={404: {"description": "Transaction not found"}})
 async def explain_alert(transaction_id: str, auth=Depends(require_scopes({"analyst", "admin"}))):
     """Explain the top risk factors for a transaction using model feature importance."""
     try:
@@ -1319,7 +1323,7 @@ async def explain_alert(transaction_id: str, auth=Depends(require_scopes({"analy
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/alerts/{transaction_id}/export")
+@router.get("/alerts/{transaction_id}/export", responses={404: {"description": "Transaction not found"}})
 async def export_alert(transaction_id: str, auth=Depends(require_scopes({"analyst", "admin"}))):
     """Export a single alert for compliance filing."""
     try:
