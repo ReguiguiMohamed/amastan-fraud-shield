@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Interactive demo site on GitHub Pages. It scores payments with the same
+  rules as the API and shows live CI, deploy and Space status.
+  `test_site_rules_match_python` keeps its rules equal to the Python ones.
+
 ## 0.1.1 - 2026-10-08
 
 - Fixed the startup crash on SQLAlchemy 2.1 with a bare `postgresql://`
