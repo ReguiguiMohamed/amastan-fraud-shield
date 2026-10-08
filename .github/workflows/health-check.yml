@@ -1,0 +1,37 @@
+name: Health check
+
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+    inputs:
+      path:
+        description: Path to request. A path that does not exist tests the failure issue.
+        default: /health/
+
+permissions:
+  contents: read
+
+concurrency:
+  group: health-check
+
+jobs:
+  check:
+    name: Check the live API
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HEALTH_PATH: ${{ inputs.path || '/health/' }}
+    steps:
+      - name: Request the API unless the Space sleeps
+        run: |
+          stage=$(curl -fsS --retry 5 --retry-all-errors https://huggingface.co/api/spaces/MohamedReg/amastan-fraud-shield-api | jq -r .runtime.stage)
+          echo "Space stage: $stage"
+          # Any request wakes a sleeping Space, so a sleeping Space counts as healthy.
+          case "$stage" in
+            SLEEPING|PAUSED) exit 0 ;;
+            RUNNING|RUNNING_*) ;;
+            *) exit 1 ;;
+          esac
+          # curl doubles the wait after each failed try, from 1 s up to 16 s.
+          curl -fsS --retry 5 --retry-all-errors "https://mohamedreg-amastan-fraud-shield-api.hf.space$HEALTH_PATH"
