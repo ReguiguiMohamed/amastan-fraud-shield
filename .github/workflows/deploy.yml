@@ -23,7 +23,7 @@ concurrency:
 jobs:
   deploy:
     name: Deploy API to Hugging Face Space
-    if: github.repository == 'ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia'
+    if: github.repository == 'ReguiguiMohamed/amastan-fraud-shield'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:

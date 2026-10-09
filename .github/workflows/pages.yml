@@ -20,7 +20,7 @@ concurrency:
 jobs:
   deploy:
     name: Deploy the demo site
-    if: github.repository == 'ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia'
+    if: github.repository == 'ReguiguiMohamed/amastan-fraud-shield'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # Publishes the Pages artifact and proves its origin with an OIDC token.
