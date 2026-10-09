@@ -1,54 +1,40 @@
----
-title: Amastan Fraud Shield Guard
-sdk: docker
-app_port: 7860
----
+<p align="center">
+  <img src="docs/logo.svg" width="112" alt="A white shield on a dark tile, crossed by a transaction pulse with one spike marked red">
+</p>
 
-# Amastan Fraud Shield Guard
+<h1 align="center">Amastan Fraud Shield</h1>
 
-A small fraud alert review API for Tunisian digital payments.
+<p align="center">
+  A fraud alert review API for Tunisian digital payments,<br>
+  live on Hugging Face Spaces with Neon PostgreSQL and Grafana Cloud.
+</p>
 
-The hosted demo runs FastAPI on Hugging Face Spaces and stores data in Neon
-PostgreSQL. The same code uses SQLite locally.
+<p align="center">
+  <a href="https://github.com/ReguiguiMohamed/amastan-fraud-shield/actions/workflows/ci.yml"><img src="https://github.com/ReguiguiMohamed/amastan-fraud-shield/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+</p>
 
-The project is finished and in maintenance mode.
+<p align="center">
+  <a href="https://reguiguimohamed.github.io/amastan-fraud-shield/"><b>Try the demo</b></a> ·
+  <a href="https://huggingface.co/spaces/MohamedReg/amastan-fraud-shield-api">Live API</a> ·
+  <a href="docs/API_REFERENCE.md">API reference</a> ·
+  <a href="docs/DEPLOYMENT.md">Deployment</a> ·
+  <a href="https://github.com/ReguiguiMohamed/amastan-fraud-shield/releases/latest">Release</a>
+</p>
 
-[Demo](https://reguiguimohamed.github.io/hybrid-real-time-fraud-detection-tunisia/)
-| [Release](https://github.com/ReguiguiMohamed/hybrid-real-time-fraud-detection-tunisia/releases/latest)
-| [API reference](docs/API_REFERENCE.md)
-| [Deployment](docs/DEPLOYMENT.md)
-| [OpenAPI](docs/openapi.json)
-| [Security](SECURITY.md)
+<br>
 
-## What It Does
+Amastan stores fraud alerts for Tunisian digital payments and gives analysts a
+queue to review them. Each verdict is kept as feedback. Reviewed cases export
+for CTAF filing, and important changes land in an audit trail.
 
-- Stores fraud alerts.
-- Gives analysts a review queue.
-- Records analyst feedback.
-- Exports reviewed cases.
-- Tracks model metadata and training outcomes.
-- Reports drift and review metrics.
-- Exposes Prometheus metrics for Grafana Cloud.
-- Keeps an audit trail for important changes.
+Two bearer tokens split the work. The admin token ingests alerts and exports
+cases, and the analyst token reads the queue and submits feedback. The same
+code runs on SQLite locally and on Neon PostgreSQL in the hosted demo.
 
-Bearer tokens separate admin and analyst access.
+> [!NOTE]
+> The project is finished and in maintenance mode.
 
-## Proof
-
-The first image shows the hosted API, an authenticated Swagger request, and the
-same alert in Neon PostgreSQL.
-
-![Hosted API and Neon PostgreSQL result](resultscreenshot.png)
-
-The second image shows the Grafana Cloud dashboard and the metric query behind
-it.
-
-![Grafana Cloud result](docs/grafana.png)
-
-The dashboard export is stored at
-[`docs/grafana-dashboard.json`](docs/grafana-dashboard.json).
-
-## Architecture
+## How it works
 
 ```mermaid
 flowchart LR
@@ -60,11 +46,39 @@ flowchart LR
     Metrics --> Grafana[Grafana Cloud]
 ```
 
-This repository contains that deployed slice only. Earlier Kafka, Spark,
-Streamlit, Ollama, ChromaDB, Kubernetes, and local monitoring experiments were
-removed during final cleanup.
+1. **A client** posts an alert to `/api/v1/alerts/add/` with the admin token.
+2. **FastAPI** stores it in SQLite locally or in Neon PostgreSQL on the Space.
+3. **An analyst** reads the review queue and records a verdict through
+   `/api/v1/feedback/`.
+4. **The API** tracks model metadata and training outcomes, and reports drift
+   and review metrics.
+5. **Grafana Cloud** scrapes `/metrics` with its own token.
 
-## Main Endpoints
+This repository holds that deployed slice only. Earlier Kafka, Spark,
+Streamlit, Ollama, ChromaDB, Kubernetes and local monitoring experiments were
+removed during the final cleanup.
+
+## Demo
+
+The [demo site](https://reguiguimohamed.github.io/amastan-fraud-shield/)
+scores a payment with the API's rules, raises an alert above the threshold and
+shows the CTAF filing deadline. It also shows live CI, deploy and Space status.
+`test_site_rules_match_python` keeps its rules equal to the Python ones.
+
+## Proof
+
+The hosted API, an authenticated Swagger request, and the same alert in Neon
+PostgreSQL:
+
+![Hosted API and Neon PostgreSQL result](resultscreenshot.png)
+
+The Grafana Cloud dashboard and the metric query behind it:
+
+![Grafana Cloud result](docs/grafana.png)
+
+The dashboard export is [`docs/grafana-dashboard.json`](docs/grafana-dashboard.json).
+
+## Endpoints
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -77,9 +91,10 @@ removed during final cleanup.
 | `GET` | `/api/v1/model/training-summary` | Model training history |
 | `GET` | `/metrics` | Prometheus metrics |
 
-Swagger is available at `/docs`.
+Swagger is served at `/docs`. The [API reference](docs/API_REFERENCE.md) lists
+every route.
 
-## Run Locally
+## Run locally
 
 Python 3.11 or 3.12 is required.
 
@@ -95,7 +110,7 @@ python -m uvicorn dashboard.api:app --reload --port 8001
 
 Open `http://localhost:8001/docs`.
 
-## Test
+## Tests
 
 ```powershell
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD = "1"
@@ -125,33 +140,35 @@ closes it.
 
 ## Repository
 
-```text
-dashboard/        FastAPI app and analytics
-src/compliance/   Filing deadlines and change audit
-src/ml/           Model lifecycle persistence
-src/shared/       Database, logging, risk config, version
-scripts/          OpenAPI and backtest utilities
-tests/            API and domain tests
-docs/             API, deployment, OpenAPI, Grafana evidence
-```
+| Path | Contents |
+|---|---|
+| [`dashboard/`](dashboard/) | FastAPI app and analytics |
+| [`src/compliance/`](src/compliance/) | Filing deadlines and change audit |
+| [`src/ml/`](src/ml/) | Model lifecycle persistence |
+| [`src/shared/`](src/shared/) | Database, logging, risk config, version |
+| [`site/`](site/) | Interactive demo for GitHub Pages |
+| [`scripts/`](scripts/) | OpenAPI and backtest utilities |
+| [`tests/`](tests/) | API, domain and demo rule tests |
+| [`docs/`](docs/) | API reference, deployment, OpenAPI, Grafana evidence, logo |
 
-## Scope
+## Before production
 
-Before public or production use:
+- Rotate every token.
+- Rehearse schema changes against PostgreSQL.
+- Define backups and retention.
+- Replace static bearer tokens with managed identity.
+- Validate legal and reporting rules with the responsible institution.
 
-- rotate every token
-- rehearse schema changes against PostgreSQL
-- define backups and retention
-- replace static bearer tokens with managed identity
-- validate legal and reporting rules with the responsible institution
+## Built with
 
-## Credits
+Python 3.11, FastAPI, SQLAlchemy, Neon PostgreSQL, the Prometheus client,
+Grafana Cloud, Docker on Hugging Face Spaces, GitHub Actions and GitHub Pages.
 
-- [Ruff](https://github.com/astral-sh/ruff), MIT, by Astral Software.
-- [Schemathesis](https://github.com/schemathesis/schemathesis), MIT, by Dmitry
-  Dygalo.
-- [zizmor](https://github.com/zizmorcore/zizmor), MIT, by William Woodruff.
+Thanks to [Ruff](https://github.com/astral-sh/ruff) by Astral Software,
+[Schemathesis](https://github.com/schemathesis/schemathesis) by Dmitry Dygalo
+and [zizmor](https://github.com/zizmorcore/zizmor) by William Woodruff, all
+MIT licensed.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). Built by [Mohamed Reguigui](https://github.com/ReguiguiMohamed).

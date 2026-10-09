@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="t">
+  <title id="t">Amastan Fraud Shield</title>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a3240"/>
+      <stop offset="1" stop-color="#0e1116"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".02"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#ff5a5f" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#ff5a5f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="30" fill="url(#tile)"/>
+  <!-- The edge keeps the dark tile visible on GitHub's dark theme. -->
+  <rect x="4.75" y="4.75" width="118.5" height="118.5" rx="29.25" fill="none" stroke="#ffffff" stroke-opacity=".12" stroke-width="1.5"/>
+  <path d="M64 28l28 12v20.5c0 17.5-12 32-28 38-16-6-28-20.5-28-38V40z" fill="url(#face)" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M43 66h9l5-11 8 22 6-17 4 6h10" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="57" cy="55" r="11" fill="url(#glow)"/>
+  <circle cx="57" cy="55" r="4.5" fill="#ff5a5f"/>
+</svg>

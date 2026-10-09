@@ -5,6 +5,10 @@
 - Interactive demo site on GitHub Pages. It scores payments with the same
   rules as the API and shows live CI, deploy and Space status.
   `test_site_rules_match_python` keeps its rules equal to the Python ones.
+- Renamed the repository to `amastan-fraud-shield`. The demo moved to
+  https://reguiguimohamed.github.io/amastan-fraud-shield/.
+- New README with a logo. The deploy writes the Space config into its own
+  short README, so GitHub no longer shows the front matter as a table.
 
 ## 0.1.1 - 2026-10-08
 
