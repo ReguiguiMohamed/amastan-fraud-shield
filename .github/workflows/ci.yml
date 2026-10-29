@@ -51,6 +51,61 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: zizmor .github/workflows
 
+  contracts:
+    name: Payment data contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-contract.txt
+
+      - name: Install the pinned CLI with local DuckDB support
+        run: pip install -r requirements-contract.txt
+
+      - name: Check generated browser policy and native exports
+        run: python scripts/generate_payment_contract.py --check
+
+      - name: Generate normalized synthetic batches
+        run: node scripts/generate_contract_fixtures.mjs
+
+      - name: Lint the ODCS contract
+        run: datacontract lint site/contracts/payments.odcs.yaml --output-format json --output data/contract/lint.json
+
+      - name: Test valid batches and deliberate violations with the CLI
+        run: python scripts/check_payment_contract.py
+
+      - name: Reject breaking contract changes
+        env:
+          BASE_REVISION: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+        run: |
+          if [ -n "$BASE_REVISION" ] && git cat-file -e "$BASE_REVISION:site/contracts/payments.odcs.yaml" 2>/dev/null; then
+            git show "$BASE_REVISION:site/contracts/payments.odcs.yaml" > data/contract/base.odcs.yaml
+            datacontract breaking data/contract/base.odcs.yaml site/contracts/payments.odcs.yaml
+            datacontract breaking data/contract/base.odcs.yaml site/contracts/payments.odcs.yaml --perspective producer
+          else
+            echo "No prior payment contract exists for this revision."
+          fi
+
+      - name: Upload contract test reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: payment-data-contract-reports
+          path: |
+            data/contract/lint.json
+            data/contract/reports/
+          if-no-files-found: error
+
   verified-slice:
     name: Verified prototype tests
     runs-on: ubuntu-latest

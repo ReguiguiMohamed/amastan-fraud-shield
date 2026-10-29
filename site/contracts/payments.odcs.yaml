@@ -1,0 +1,179 @@
+apiVersion: v3.2.0
+kind: DataContract
+id: urn:amastan:payments:normalized:v1
+name: Amastan normalized payment batch
+version: 1.0.0
+status: active
+domain: fraud-review
+dataProduct: Amastan investigation desk
+description:
+  purpose: One normalized record per payment, keyed by transaction_id within a batch.
+  usage: Local analyst triage, linked-account investigation and labeled batch evaluation.
+  limitations: >-
+    This contract covers normalized payment records, not the hosted alert API,
+    analyst verdicts or workspace envelopes. Conformance does not establish
+    that a payment is legitimate or that a fraud signal is accurate.
+team:
+  name: Amastan Fraud Shield
+  members:
+    - username: ReguiguiMohamed
+      role: owner
+servers:
+  - server: local
+    type: local
+    format: json
+    path: ${PAYMENTS_FILE:-data/contract/payments.json}
+customProperties:
+  - property: maxCsvBytes
+    value: 2000000
+  - property: timestampInputPattern
+    value: '^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$'
+schema:
+  - name: payments
+    description: >-
+      CSV input is normalized before crossing this boundary. All ten fields
+      are materialized. Optional device identifiers default to an empty string,
+      reported_scam defaults to false and missing evaluation labels remain null.
+      Timestamps are UTC with millisecond precision. No arrival-order or freshness
+      guarantee applies to user-supplied historical batches.
+    quality:
+      - id: batch_row_count
+        type: sql
+        dimension: completeness
+        description: A batch contains between one and five thousand payments.
+        query: SELECT COUNT(*) FROM payments
+        mustBeBetween: [1, 5000]
+      - id: amount_millime_precision
+        type: sql
+        dimension: conformity
+        description: Amounts represent whole Tunisian millimes within floating-point tolerance.
+        query: >-
+          SELECT COUNT(*) FROM payments
+          WHERE ABS(amount_tnd * 1000 - ROUND(amount_tnd * 1000)) > 0.0001
+        mustBe: 0
+      - id: timestamp_calendar_valid
+        type: sql
+        dimension: conformity
+        description: UTC timestamp strings must also represent real calendar dates.
+        query: >-
+          SELECT COUNT(*) FROM payments
+          WHERE TRY_CAST("timestamp" AS TIMESTAMPTZ) IS NULL
+        mustBe: 0
+    properties:
+      - name: transaction_id
+        logicalType: string
+        description: Unique payment identifier within this batch. Leading zeros are significant.
+        primaryKey: true
+        required: true
+        logicalTypeOptions:
+          minLength: 1
+          maxLength: 80
+          pattern: '^[^\x00-\x1f\x7f]*$'
+        customProperties:
+          - property: csvRequired
+            value: true
+      - name: user_id
+        logicalType: string
+        description: Sender account identifier, in the same namespace as recipient_id.
+        required: true
+        logicalTypeOptions:
+          minLength: 1
+          maxLength: 80
+          pattern: '^[^\x00-\x1f\x7f]*$'
+        customProperties:
+          - property: csvRequired
+            value: true
+      - name: recipient_id
+        logicalType: string
+        description: Recipient account identifier. It need not appear as a sender in this batch.
+        required: true
+        logicalTypeOptions:
+          minLength: 1
+          maxLength: 80
+          pattern: '^[^\x00-\x1f\x7f]*$'
+        customProperties:
+          - property: csvRequired
+            value: true
+      - name: amount_tnd
+        logicalType: number
+        description: Positive payment amount in Tunisian dinars, to three decimal places.
+        required: true
+        logicalTypeOptions:
+          minimum: 0.001
+          maximum: 100000000
+        customProperties:
+          - property: csvRequired
+            value: true
+          - property: decimalPlaces
+            value: 3
+      - name: timestamp
+        logicalType: string
+        description: Payment event time normalized to UTC, for example 2026-10-29T09:00:00.000Z.
+        required: true
+        logicalTypeOptions:
+          pattern: '^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d\.\d{3}Z$'
+        customProperties:
+          - property: csvRequired
+            value: true
+      - name: governorate
+        logicalType: string
+        description: Canonical Tunisian governorate name. Raw imports accept case-insensitive names.
+        required: true
+        enum:
+          - value: Tunis
+          - value: Ariana
+          - value: Ben Arous
+          - value: Manouba
+          - value: Bizerte
+          - value: Nabeul
+          - value: Zaghouan
+          - value: Béja
+          - value: Jendouba
+          - value: Le Kef
+          - value: Siliana
+          - value: Sousse
+          - value: Monastir
+          - value: Mahdia
+          - value: Kairouan
+          - value: Kasserine
+          - value: Sidi Bouzid
+          - value: Sfax
+          - value: Gafsa
+          - value: Tozeur
+          - value: Kébili
+          - value: Gabès
+          - value: Médenine
+          - value: Tataouine
+        customProperties:
+          - property: csvRequired
+            value: true
+      - name: payment_method
+        logicalType: string
+        description: Canonical lowercase payment method.
+        required: true
+        enum:
+          - value: card
+          - value: flouci
+          - value: d17
+          - value: edinar
+          - value: konnect
+          - value: bank_transfer
+        customProperties:
+          - property: csvRequired
+            value: true
+      - name: device_id
+        logicalType: string
+        description: Optional device identifier. An empty string means no device was supplied.
+        required: true
+        logicalTypeOptions:
+          minLength: 0
+          maxLength: 80
+          pattern: '^[^\x00-\x1f\x7f]*$'
+      - name: reported_scam
+        logicalType: boolean
+        description: Explicit customer report supplied with the data. Never inferred by the scorer.
+        required: true
+      - name: expected_fraud
+        logicalType: boolean
+        description: Optional supplied evaluation outcome. Null means unlabeled, not legitimate.
+        required: false

@@ -13,6 +13,7 @@ import {
   FINDINGS,
 } from "./investigation.js";
 import { scenario, SCENARIOS } from "./scenarios.js";
+import { PAYMENT_CONTRACT } from "./contracts/payment-contract.js";
 
 const $ = (id) => document.getElementById(id);
 const escape = (value) =>
@@ -77,6 +78,10 @@ function payload() {
   return {
     format: "amastan-workspace",
     version: 1,
+    data_contract: {
+      id: PAYMENT_CONTRACT.id,
+      version: PAYMENT_CONTRACT.version,
+    },
     source: sourceName,
     scenario: activeScenario,
     threshold: data.threshold,
@@ -302,7 +307,7 @@ function renderDetail() {
   ].join("");
   const history = (review?.history ?? []).slice().reverse();
   $("case-detail").innerHTML =
-    `<div class="case-top"><p class="eyebrow">03 / CASE FILE <span>${VERDICTS[verdict].toUpperCase()}</span></p><h2>${escape(row.transaction_id)}</h2><p>${escape(row.user_id)} → ${escape(row.recipient_id)}</p></div><div class="case-body"><div class="case-amount">${amount(row.amount_tnd)} <small>TND</small></div><dl class="case-meta"><div><dt>Recorded payment</dt><dd>${clock(row.timestamp)} · Tunis</dd></div><div><dt>Governorate / method</dt><dd>${escape(row.governorate)} / ${escape(row.payment_method)}</dd></div><div><dt>Base rule score</dt><dd>${row.score.toFixed(2)} / 1.00</dd></div><div><dt>Device</dt><dd>${escape(row.device_id || "Not supplied")}</dd></div></dl><div><h3>${row.rules.length + row.findings.length} explainable signals</h3>${signals || '<p class="small">No prototype signal was triggered. That does not establish that this payment is legitimate.</p>'}</div><div><h3>Record your decision</h3><label class="note-label" for="case-note">Analyst note</label><textarea id="case-note" maxlength="2000" placeholder="What did you check? What context is missing?"></textarea><div class="saved-note" hidden><strong>Recorded analyst note</strong><p>${escape(review?.note || "No note recorded.")}</p></div><div class="decision-actions"><button data-verdict="confirmed">Confirm fraud</button><button data-verdict="cleared">Clear payment</button><button data-verdict="needs_info">Need context</button></div><p class="case-save-state">${review ? `Decision recorded ${clock(review.updated_at)}. ${persist ? "Saved on this device." : "In this browser session."}` : "Draft notes are recorded when you choose a decision. Session only until saved or exported."}</p><div class="case-tools"><button id="export-case" class="text-button">Evidence JSON ↓</button><button id="print-case" class="text-button">Print case brief</button></div>${history.length ? `<h3>Decision history</h3><ol class="timeline">${history.map((entry) => `<li><time>${clock(entry.at)} · Tunis</time>${VERDICTS[entry.verdict]}${entry.note ? ` · ${escape(entry.note)}` : ""}</li>`).join("")}</ol>` : ""}</div><div><h3>Connected payment timeline</h3><ol class="timeline">${timeline.map((r) => `<li><time>${clock(r.timestamp)} · Tunis</time><a href="#queue" data-case="${escape(r.transaction_id)}">${escape(r.user_id)} → ${escape(r.recipient_id)}</a><br>${amount(r.amount_tnd)} TND${r.transaction_id === selected ? " · selected" : ""}</li>`).join("")}</ol>${relatedRows(row).length > 30 ? '<p class="small">First 30 related payments shown. Search the queue for more.</p>' : ""}</div></div>`;
+    `<div class="case-top"><p class="eyebrow">CASE FILE <span>${VERDICTS[verdict].toUpperCase()}</span></p><h2>${escape(row.transaction_id)}</h2><p>${escape(row.user_id)} → ${escape(row.recipient_id)}</p></div><div class="case-body"><div class="case-amount">${amount(row.amount_tnd)} <small>TND</small></div><dl class="case-meta"><div><dt>Recorded payment</dt><dd>${clock(row.timestamp)} · Tunis</dd></div><div><dt>Governorate / method</dt><dd>${escape(row.governorate)} / ${escape(row.payment_method)}</dd></div><div><dt>Base rule score</dt><dd>${row.score.toFixed(2)} / 1.00</dd></div><div><dt>Device</dt><dd>${escape(row.device_id || "Not supplied")}</dd></div></dl><div><h3>${row.rules.length + row.findings.length} explainable signals</h3>${signals || '<p class="small">No prototype signal was triggered. That does not establish that this payment is legitimate.</p>'}</div><div><h3>Record your decision</h3><label class="note-label" for="case-note">Analyst note</label><textarea id="case-note" maxlength="2000" placeholder="What did you check? What context is missing?"></textarea><div class="saved-note" hidden><strong>Recorded analyst note</strong><p>${escape(review?.note || "No note recorded.")}</p></div><div class="decision-actions"><button data-verdict="confirmed">Confirm fraud</button><button data-verdict="cleared">Clear payment</button><button data-verdict="needs_info">Need context</button></div><p class="case-save-state">${review ? `Decision recorded ${clock(review.updated_at)}. ${persist ? "Saved on this device." : "In this browser session."}` : "Draft notes are recorded when you choose a decision. Session only until saved or exported."}</p><div class="case-tools"><button id="export-case" class="text-button">Evidence JSON ↓</button><button id="print-case" class="text-button">Print case brief</button></div>${history.length ? `<h3>Decision history</h3><ol class="timeline">${history.map((entry) => `<li><time>${clock(entry.at)} · Tunis</time>${VERDICTS[entry.verdict]}${entry.note ? ` · ${escape(entry.note)}` : ""}</li>`).join("")}</ol>` : ""}</div><div><h3>Connected payment timeline</h3><ol class="timeline">${timeline.map((r) => `<li><time>${clock(r.timestamp)} · Tunis</time><a href="#queue" data-case="${escape(r.transaction_id)}">${escape(r.user_id)} → ${escape(r.recipient_id)}</a><br>${amount(r.amount_tnd)} TND${r.transaction_id === selected ? " · selected" : ""}</li>`).join("")}</ol>${relatedRows(row).length > 30 ? '<p class="small">First 30 related payments shown. Search the queue for more.</p>' : ""}</div></div>`;
   $("case-note").value = note;
   $("case-note").addEventListener("input", (event) =>
     drafts.set(selected, event.target.value),
@@ -361,11 +366,11 @@ function renderGraph() {
       {
         selector: "node",
         style: {
-          "background-color": "#a3b8ac",
+          "background-color": "#a1b2c2",
           label: "data(display_label)",
           "font-size": 8,
           "font-family": "JetBrains Mono, monospace",
-          color: "#31453a",
+          color: "#304b61",
           "text-valign": "bottom",
           "text-margin-y": 7,
           "text-wrap": "ellipsis",
@@ -373,15 +378,15 @@ function renderGraph() {
           width: 17,
           height: 17,
           "border-width": 3,
-          "border-color": "#f5f8f3",
+          "border-color": "#ffffff",
         },
       },
       {
         selector: "edge",
         style: {
           width: 1.5,
-          "line-color": "#c4cfc4",
-          "target-arrow-color": "#9eb19f",
+          "line-color": "#b6c6d4",
+          "target-arrow-color": "#8da4b7",
           "target-arrow-shape": "triangle",
           "curve-style": "bezier",
           "arrow-scale": 0.7,
@@ -454,8 +459,8 @@ function renderLab() {
 function render() {
   $("scenario-list").innerHTML = Object.entries(SCENARIOS)
     .map(
-      ([key, value], i) =>
-        `<button class="scenario" data-scenario="${key}" aria-pressed="${key === activeScenario}"><span>0${i + 1} / ${key === "clean" ? "CONTROL" : "CASE STUDY"}</span><strong>${value.title}</strong></button>`,
+      ([key, value]) =>
+        `<button class="scenario" data-scenario="${key}" aria-pressed="${key === activeScenario}"><strong>${value.title}</strong></button>`,
     )
     .join("");
   $("scenario-story").textContent = activeScenario
@@ -482,6 +487,10 @@ async function exportCase() {
   const bundle = await evidence({
     format: "amastan-case",
     version: 1,
+    data_contract: {
+      id: PAYMENT_CONTRACT.id,
+      version: PAYMENT_CONTRACT.version,
+    },
     source: sourceName,
     threshold: data.threshold,
     transaction: row,
@@ -617,6 +626,12 @@ function wire() {
       "text/csv;charset=utf-8",
     ),
   );
+  $("export-payments").addEventListener("click", () =>
+    download(
+      JSON.stringify(payload().transactions, null, 2),
+      "amastan-payments.json",
+    ),
+  );
   $("export-csv").addEventListener("click", () =>
     download(
       exportCSV(viewRows(), reviews),
@@ -674,7 +689,7 @@ function wire() {
     const link = document.createElement("a");
     link.href = graph.png({
       full: true,
-      bg: "#f8faf5",
+      bg: "#ffffff",
       maxWidth: 2400,
       maxHeight: 1800,
     });
@@ -698,6 +713,8 @@ function start() {
     $("method-signals").innerHTML = Object.values(FINDINGS)
       .map((f) => `<dt>${f.title}</dt><dd>${f.detail}</dd>`)
       .join("");
+    $("contract-summary").textContent =
+      `Payment contract ${PAYMENT_CONTRACT.version} · ODCS ${PAYMENT_CONTRACT.standard}. Shared import limits are generated from this contract; CI tests normalized scenarios using Data Contract CLI.`;
     wire();
     let saved = null;
     try {

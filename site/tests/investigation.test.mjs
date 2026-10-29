@@ -56,6 +56,7 @@ test("malformed CSV and duplicate headers do not produce a partial batch", () =>
 
 test("invalid amounts, dates, identifiers and duplicate transactions are rejected", () => {
   for (const amount_tnd of [
+    0.00000001,
     0,
     -1,
     Infinity,

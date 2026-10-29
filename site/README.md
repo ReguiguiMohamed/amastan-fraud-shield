@@ -22,9 +22,11 @@ Open `http://localhost:8765/workbench.html`.
 | `workbench.html`, `workbench.css`, `workbench.js` | Investigation interface |
 | `investigation.js` | Import validation, temporal analysis, graph findings and evidence |
 | `scenarios.js` | Six deterministic fictional cases |
+| `contracts/` | ODCS payment contract, generated browser policy and native CLI exports |
 | `tests/` | Node unit tests |
 | `browser-tests/` | Playwright desktop, mobile and workspace checks |
 | `vendor/` | Pinned MIT-licensed browser libraries |
 
-The [investigation guide](../docs/INVESTIGATION_DESK.md) owns the CSV contract,
+The [payment contract guide](contracts/README.md) owns schema and CLI checks.
+The [investigation guide](../docs/INVESTIGATION_DESK.md) owns import behavior,
 signal definitions, storage behavior, limits, research and verification steps.

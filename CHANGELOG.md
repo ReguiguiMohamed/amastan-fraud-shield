@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Added an ODCS payment contract with Data Contract CLI checks, generated
+  browser constraints, native JSON Schema and HTML documentation exports.
+- Added normalized record downloads and contract metadata in case and
+  workspace exports. Amounts below one millime are rejected before rounding.
+- Simplified the investigation desk header and scenario controls, increased
+  label sizes and linked the selected queue row and case with a blue rail.
+
 ## 0.2.0 - 2026-10-29
 
 - Added a browser investigation desk with six synthetic case studies, local
