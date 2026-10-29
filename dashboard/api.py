@@ -126,7 +126,10 @@ def get_db_session():
     try:
         yield db
     except (DataError, ValueError):
-        raise HTTPException(status_code=422, detail="Invalid database input") from None
+        raise HTTPException(
+            status_code=422,
+            detail=[{"loc": ["request"], "msg": "Invalid database input", "type": "value_error"}],
+        ) from None
     except OperationalError:
         _database_status = "unavailable"
         _database_checked_at = _time.time()

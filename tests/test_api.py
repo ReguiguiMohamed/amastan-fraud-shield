@@ -167,7 +167,9 @@ class TestHealthEndpoint:
             headers=analyst_headers,
         )
         assert response.status_code == 422
-        assert response.json() == {"detail": "Invalid database input"}
+        assert response.json() == {
+            "detail": [{"loc": ["request"], "msg": "Invalid database input", "type": "value_error"}]
+        }
         session.close.assert_called_once()
 
 
