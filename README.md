@@ -138,7 +138,7 @@ closes it.
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| [CI](.github/workflows/ci.yml) | Push to `main`, pull request, manual | Ruff, zizmor, tests with 70% coverage, OpenAPI snapshot, backtest artifact, Schemathesis against Postgres, Bandit gate, Docker build |
+| [CI](.github/workflows/ci.yml) | Push to `main`, pull request, manual | Ruff, zizmor, Python tests with 70% coverage, browser scenarios, ODCS contract checks, OpenAPI snapshot, backtest artifact, Schemathesis against Postgres, Bandit gate, Docker build |
 | [Deploy](.github/workflows/deploy.yml) | Push to `main` that changes the image, manual | Pushes the API to the Space and waits for the build |
 | [Dependabot](.github/workflows/dependabot.yml) | Dependabot pull request, CI run | Labels updates and merges patch and minor ones after CI passes |
 | [Health check](.github/workflows/health-check.yml) | Daily at 07:17 UTC, manual | Calls `/health/` unless the Space sleeps |
@@ -177,6 +177,12 @@ Thanks to [Ruff](https://github.com/astral-sh/ruff) by Astral Software,
 [Schemathesis](https://github.com/schemathesis/schemathesis) by Dmitry Dygalo
 and [zizmor](https://github.com/zizmorcore/zizmor) by William Woodruff, all
 MIT licensed.
+
+Payment contract checks and JSON Schema/HTML exports use
+[Data Contract CLI](https://github.com/datacontract/datacontract-cli), an
+[MIT-licensed](https://github.com/datacontract/datacontract-cli/blob/main/LICENSE)
+open-source project. The [contract guide](site/contracts/README.md) documents
+the pinned version and local commands.
 
 ## License
 

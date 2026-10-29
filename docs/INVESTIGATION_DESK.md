@@ -122,6 +122,11 @@ exports. Both are MIT-licensed. The pinned bundles, original licenses,
 npm tarball integrity values and file hashes live in
 [`site/vendor`](../site/vendor/).
 
+[Data Contract CLI](https://github.com/datacontract/datacontract-cli) checks
+normalized payment fixtures in CI and exports the contract's JSON Schema and
+HTML documentation. Its license and local commands are linked in the
+[payment contract guide](../site/contracts/README.md).
+
 The graph library's recursive component analysis exceeded the JavaScript
 call-stack limit on a 5,000-payment chain during verification. Batch analysis
 therefore uses an iterative Kosaraju traversal. Cytoscape handles display.

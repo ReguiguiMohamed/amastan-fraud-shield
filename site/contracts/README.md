@@ -25,9 +25,16 @@ data conformance, not detection accuracy or payment legitimacy.
 
 ## Local checks
 
-[Data Contract CLI](https://cli.datacontract.com/) is MIT-licensed. The pinned
-CLI and DuckDB extra live in `requirements-contract.txt`, separate from the
-application runtime. No paid account, cloud database or credentials are needed.
+[Data Contract CLI](https://github.com/datacontract/datacontract-cli) provides
+the contract linting, data tests, compatibility checks and native exports used
+here. It is an open-source project under the
+[MIT license](https://github.com/datacontract/datacontract-cli/blob/main/LICENSE).
+Its [documentation](https://cli.datacontract.com/) covers the commands and
+supported data sources.
+
+The pinned CLI version and DuckDB extra live in
+[`requirements-contract.txt`](../../requirements-contract.txt), separate from
+the application runtime. No paid account, cloud database or credentials are needed.
 
 From the repository root, install the requirements in a disposable Python 3.11
 environment, then run these commands with that environment active:
