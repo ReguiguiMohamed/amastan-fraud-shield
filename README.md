@@ -57,9 +57,6 @@ flowchart LR
    and review metrics.
 5. **Grafana Cloud** scrapes `/metrics` with its own token.
 
-This repository holds that deployed slice only. Earlier Kafka, Spark,
-Streamlit, Ollama, ChromaDB, Kubernetes and local monitoring experiments were
-removed during the final cleanup.
 
 ## Demo
 
