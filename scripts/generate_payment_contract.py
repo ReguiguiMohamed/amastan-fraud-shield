@@ -59,6 +59,7 @@ def main():
         "payments.html": exporter.export("html"),
     }
     for name, content in exports.items():
+        content = "\n".join(line.rstrip() for line in content.splitlines()) + "\n"
         output = CONTRACT.parent / name
         if args.check:
             existing = output.read_text(encoding="utf-8") if output.exists() else ""

@@ -4,7 +4,7 @@
   <title>Data Contract</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <script src="https://unpkg.com/@panzoom/panzoom@4.6.0/dist/panzoom.min.js"></script>
 
   <style>
@@ -2190,7 +2190,7 @@ video {
 </div>
       <div>
         <div class="space-y-6 mt-6">
-          
+
 
 
 
@@ -2207,73 +2207,73 @@ video {
   <div class="mt-2 overflow-hidden shadow sm:rounded-lg bg-white">
     <div class="px-4 py-4 sm:px-6">
 
-      
+
 
       <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-        
+
         <div class="sm:col-span-1">
           <dt class="text-sm font-medium text-gray-500">Name</dt>
           <dd class="mt-1 text-sm text-gray-900">Amastan normalized payment batch</dd>
         </div>
-        
 
-        
+
+
         <div class="sm:col-span-1">
           <dt class="text-sm font-medium text-gray-500">Version</dt>
           <dd class="mt-1 text-sm text-gray-900">1.0.0</dd>
         </div>
-        
 
-        
+
+
         <div class="sm:col-span-1">
           <dt class="text-sm font-medium text-gray-500">ID</dt>
           <dd class="mt-1 text-sm text-gray-900">urn:amastan:payments:normalized:v1</dd>
         </div>
-        
 
-        
+
+
         <div class="sm:col-span-1">
           <dt class="text-sm font-medium text-gray-500">Status</dt>
           <dd class="mt-1 text-sm text-gray-900">active</dd>
         </div>
-        
 
-        
 
-        
+
+
+
         <div class="sm:col-span-1">
           <dt class="text-sm font-medium text-gray-500">Domain</dt>
           <dd class="mt-1 text-sm text-gray-900">fraud-review</dd>
         </div>
-        
 
-        
+
+
         <div class="sm:col-span-1">
           <dt class="text-sm font-medium text-gray-500">Data Product</dt>
           <dd class="mt-1 text-sm text-gray-900">Amastan investigation desk</dd>
         </div>
-        
 
-        
 
-        
+
+
+
       </dl>
     </div>
   </div>
 </section>
 
-          
-
-
-          
 
 
 
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
   <section id="terms-of-use">
     <div class="px-4 sm:px-0">
       <h1 class="text-base font-semibold leading-6 text-gray-900" id="terms-of-use">Terms of Use</h1>
@@ -2283,36 +2283,36 @@ video {
     <div class="mt-2 overflow-hidden shadow sm:rounded-lg bg-white">
       <div class="px-4 py-4 sm:px-6">
 
-        
+
 
         <div class="flex flex-col gap-3">
-          
+
           <div id="description-purpose">
             <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Purpose</div>
             <div class="mt-1 text-sm text-gray-700 whitespace-pre-wrap">One normalized record per payment, keyed by transaction_id within a batch.</div>
           </div>
-          
 
-          
+
+
           <div id="description-usage">
             <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Usage</div>
             <div class="mt-1 text-sm text-gray-700 whitespace-pre-wrap">Local analyst triage, linked-account investigation and labeled batch evaluation.</div>
           </div>
-          
 
-          
+
+
           <div id="description-limitations">
             <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Limitations</div>
             <div class="mt-1 text-sm text-gray-700 whitespace-pre-wrap">This contract covers normalized payment records, not the hosted alert API, analyst verdicts or workspace envelopes. Conformance does not establish that a payment is legitimate or that a fraud signal is accurate.</div>
           </div>
-          
 
-          
+
+
         </div>
       </div>
     </div>
   </section>
-  
+
 
           <section id="diagram">
   <div class="px-4 sm:px-0">
@@ -2369,7 +2369,7 @@ video {
     });
   </script>
 </section>
-          
+
 
 
 
@@ -2382,19 +2382,19 @@ video {
     <p class="text-sm text-gray-500">Schema supports both a business representation and physical implementation</p>
   </div>
 
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <div class="mt-2 print:block" id="payments">
       <div class="overflow-x-auto shadow ring-1 ring-black/5 sm:rounded-lg">
@@ -2403,36 +2403,36 @@ video {
             <tr class="print:break-inside-avoid-page">
               <th scope="colgroup" colspan="3" class="py-2 pl-4 pr-3 text-left font-semibold text-gray-900 sm:pl-6">
                 <a href="#payments">
-                  
+
                   <span class="font-mono font-medium ">payments</span>
                 </a>
 
-                
 
-                
 
-                
 
-                
+
+
+
+
                   <div class="text-sm font-normal text-gray-500 mt-1">CSV input is normalized before crossing this boundary. All ten fields are materialized. Optional device identifiers default to an empty string, reported_scam defaults to false and missing evaluation labels remain null. Timestamps are UTC with millisecond precision. No arrival-order or freshness guarantee applies to user-supplied historical batches.</div>
-                
+
 
                 <div class="font-normal"></div>
 
-                
 
-                
 
-                
 
-                
+
+
+
+
                   <div class="mt-2 flex flex-wrap gap-1">
-                    
-                      
-                      
-                      
-                      
-                      
+
+
+
+
+
+
                       <span
                         class="inline-flex items-center rounded-md bg-fuchsia-50 px-2 py-1 text-xs font-medium text-fuchsia-700 ring-1 ring-inset ring-fuchsia-600/20"
                         title="A batch contains between one and five thousand payments.
@@ -2441,12 +2441,12 @@ dimension: completeness"
                       >
                         qualityCheck
                       </span>
-                    
-                      
-                      
-                      
-                      
-                      
+
+
+
+
+
+
                       <span
                         class="inline-flex items-center rounded-md bg-fuchsia-50 px-2 py-1 text-xs font-medium text-fuchsia-700 ring-1 ring-inset ring-fuchsia-600/20"
                         title="Amounts represent whole Tunisian millimes within floating-point tolerance.
@@ -2455,12 +2455,12 @@ dimension: conformity"
                       >
                         qualityCheck
                       </span>
-                    
-                      
-                      
-                      
-                      
-                      
+
+
+
+
+
+
                       <span
                         class="inline-flex items-center rounded-md bg-fuchsia-50 px-2 py-1 text-xs font-medium text-fuchsia-700 ring-1 ring-inset ring-fuchsia-600/20"
                         title="UTC timestamp strings must also represent real calendar dates.
@@ -2469,87 +2469,87 @@ dimension: conformity"
                       >
                         qualityCheck
                       </span>
-                    
+
                   </div>
-                
+
               </th>
             </tr>
           </thead>
 
           <tbody class="divide-y divide-gray-200 bg-white">
-            
-              
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-    
 
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <tr class="print:break-inside-avoid-page align-top" id="payments.transaction_id">
       <td class="py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6">
         <div class="flex items-start">
           <span style="padding-left: 0.0rem;">
-            
+
           </span>
           <div>
             <a href="#payments.transaction_id">
-              
+
               <span class="font-mono">transaction_id</span>
             </a>
-            
+
           </div>
         </div>
       </td>
 
       <td class="px-1 py-2 text-sm text-gray-500">
-        
+
           <span
             class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10 mr-1 mb-1"
             title="logicalType: string
@@ -2560,143 +2560,143 @@ pattern: ^[^\x00-\x1f\x7f]*$"
             <span>string</span>
             <span class="text-blue-500">ⓘ</span>
           </span>
-        
+
       </td>
 
       <td class="px-3 py-2 text-sm text-gray-500">
-        
+
           <div>Unique payment identifier within this batch. Leading zeros are significant.</div>
-        
 
-        
 
-        
 
-        
-        
+
+
+
+
+
 
         <div class="mt-1 flex gap-x-1 items-center flex-wrap">
-          
+
             <span class="inline-flex items-center rounded-md bg-gray-50 px-1 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
               primaryKey
             </span>
-          
 
-          
+
+
             <span class="inline-flex items-center rounded-md bg-gray-50 px-1 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">required</span>
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
-            
-              
-                
+
+
+
+
+
+
+
+
+
+
+
+
+
                   <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20">
                     csvRequired:True
                   </span>
-                
-              
-            
-          
 
-          
 
-          
+
+
+
+
+
+
         </div>
       </td>
     </tr>
 
-    
 
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-    
 
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <tr class="print:break-inside-avoid-page align-top" id="payments.user_id">
       <td class="py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6">
         <div class="flex items-start">
           <span style="padding-left: 0.0rem;">
-            
+
           </span>
           <div>
             <a href="#payments.user_id">
-              
+
               <span class="font-mono">user_id</span>
             </a>
-            
+
           </div>
         </div>
       </td>
 
       <td class="px-1 py-2 text-sm text-gray-500">
-        
+
           <span
             class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10 mr-1 mb-1"
             title="logicalType: string
@@ -2707,139 +2707,139 @@ pattern: ^[^\x00-\x1f\x7f]*$"
             <span>string</span>
             <span class="text-blue-500">ⓘ</span>
           </span>
-        
+
       </td>
 
       <td class="px-3 py-2 text-sm text-gray-500">
-        
+
           <div>Sender account identifier, in the same namespace as recipient_id.</div>
-        
 
-        
 
-        
 
-        
-        
+
+
+
+
+
 
         <div class="mt-1 flex gap-x-1 items-center flex-wrap">
-          
 
-          
+
+
             <span class="inline-flex items-center rounded-md bg-gray-50 px-1 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">required</span>
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
-            
-              
-                
+
+
+
+
+
+
+
+
+
+
+
+
+
                   <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20">
                     csvRequired:True
                   </span>
-                
-              
-            
-          
 
-          
 
-          
+
+
+
+
+
+
         </div>
       </td>
     </tr>
 
-    
 
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-    
 
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <tr class="print:break-inside-avoid-page align-top" id="payments.recipient_id">
       <td class="py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6">
         <div class="flex items-start">
           <span style="padding-left: 0.0rem;">
-            
+
           </span>
           <div>
             <a href="#payments.recipient_id">
-              
+
               <span class="font-mono">recipient_id</span>
             </a>
-            
+
           </div>
         </div>
       </td>
 
       <td class="px-1 py-2 text-sm text-gray-500">
-        
+
           <span
             class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10 mr-1 mb-1"
             title="logicalType: string
@@ -2850,139 +2850,139 @@ pattern: ^[^\x00-\x1f\x7f]*$"
             <span>string</span>
             <span class="text-blue-500">ⓘ</span>
           </span>
-        
+
       </td>
 
       <td class="px-3 py-2 text-sm text-gray-500">
-        
+
           <div>Recipient account identifier. It need not appear as a sender in this batch.</div>
-        
 
-        
 
-        
 
-        
-        
+
+
+
+
+
 
         <div class="mt-1 flex gap-x-1 items-center flex-wrap">
-          
 
-          
+
+
             <span class="inline-flex items-center rounded-md bg-gray-50 px-1 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">required</span>
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
-            
-              
-                
+
+
+
+
+
+
+
+
+
+
+
+
+
                   <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20">
                     csvRequired:True
                   </span>
-                
-              
-            
-          
 
-          
 
-          
+
+
+
+
+
+
         </div>
       </td>
     </tr>
 
-    
 
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-    
 
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <tr class="print:break-inside-avoid-page align-top" id="payments.amount_tnd">
       <td class="py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6">
         <div class="flex items-start">
           <span style="padding-left: 0.0rem;">
-            
+
           </span>
           <div>
             <a href="#payments.amount_tnd">
-              
+
               <span class="font-mono">amount_tnd</span>
             </a>
-            
+
           </div>
         </div>
       </td>
 
       <td class="px-1 py-2 text-sm text-gray-500">
-        
+
           <span
             class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10 mr-1 mb-1"
             title="logicalType: number
@@ -2992,145 +2992,145 @@ maximum: 100000000"
             <span>number</span>
             <span class="text-blue-500">ⓘ</span>
           </span>
-        
+
       </td>
 
       <td class="px-3 py-2 text-sm text-gray-500">
-        
+
           <div>Positive payment amount in Tunisian dinars, to three decimal places.</div>
-        
 
-        
 
-        
 
-        
-        
+
+
+
+
+
 
         <div class="mt-1 flex gap-x-1 items-center flex-wrap">
-          
 
-          
+
+
             <span class="inline-flex items-center rounded-md bg-gray-50 px-1 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">required</span>
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
-            
-              
-                
+
+
+
+
+
+
+
+
+
+
+
+
+
                   <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20">
                     csvRequired:True
                   </span>
-                
-              
-                
+
+
+
                   <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20">
                     decimalPlaces:3
                   </span>
-                
-              
-            
-          
 
-          
 
-          
+
+
+
+
+
+
         </div>
       </td>
     </tr>
 
-    
 
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-    
 
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <tr class="print:break-inside-avoid-page align-top" id="payments.timestamp">
       <td class="py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6">
         <div class="flex items-start">
           <span style="padding-left: 0.0rem;">
-            
+
           </span>
           <div>
             <a href="#payments.timestamp">
-              
+
               <span class="font-mono">timestamp</span>
             </a>
-            
+
           </div>
         </div>
       </td>
 
       <td class="px-1 py-2 text-sm text-gray-500">
-        
+
           <span
             class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10 mr-1 mb-1"
             title="logicalType: string
@@ -3139,115 +3139,115 @@ pattern: ^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d\.\d{3}Z$"
             <span>string</span>
             <span class="text-blue-500">ⓘ</span>
           </span>
-        
+
       </td>
 
       <td class="px-3 py-2 text-sm text-gray-500">
-        
+
           <div>Payment event time normalized to UTC, for example 2026-10-29T09:00:00.000Z.</div>
-        
 
-        
 
-        
 
-        
-        
+
+
+
+
+
 
         <div class="mt-1 flex gap-x-1 items-center flex-wrap">
-          
 
-          
+
+
             <span class="inline-flex items-center rounded-md bg-gray-50 px-1 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">required</span>
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
-            
-              
-                
+
+
+
+
+
+
+
+
+
+
+
+
+
                   <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20">
                     csvRequired:True
                   </span>
-                
-              
-            
-          
 
-          
 
-          
+
+
+
+
+
+
         </div>
       </td>
     </tr>
 
-    
 
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
 
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <tr class="print:break-inside-avoid-page align-top" id="payments.governorate">
       <td class="py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6">
         <div class="flex items-start">
           <span style="padding-left: 0.0rem;">
-            
+
           </span>
           <div>
             <a href="#payments.governorate">
-              
+
               <span class="font-mono">governorate</span>
             </a>
-            
+
           </div>
         </div>
       </td>
 
       <td class="px-1 py-2 text-sm text-gray-500">
-        
+
           <span
             class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10 mr-1 mb-1"
             title="logicalType: string"
@@ -3255,266 +3255,266 @@ pattern: ^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d\.\d{3}Z$"
             <span>string</span>
             <span class="text-blue-500">ⓘ</span>
           </span>
-        
+
       </td>
 
       <td class="px-3 py-2 text-sm text-gray-500">
-        
+
           <div>Canonical Tunisian governorate name. Raw imports accept case-insensitive names.</div>
-        
 
-        
 
-        
 
-        
-        
+
+
+
+
+
           <div class="mt-1">
             <span class="text-gray-500">Allowed values</span>
             <ul class="ml-4 list-disc">
-              
+
                 <li>
                   <code class="text-xs">Tunis</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Ariana</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Ben Arous</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Manouba</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Bizerte</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Nabeul</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Zaghouan</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Béja</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Jendouba</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Le Kef</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Siliana</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Sousse</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Monastir</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Mahdia</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Kairouan</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Kasserine</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Sidi Bouzid</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Sfax</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Gafsa</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Tozeur</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Kébili</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Gabès</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Médenine</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">Tataouine</code>
-                  
-                  
+
+
                 </li>
-              
+
             </ul>
           </div>
-        
+
 
         <div class="mt-1 flex gap-x-1 items-center flex-wrap">
-          
 
-          
+
+
             <span class="inline-flex items-center rounded-md bg-gray-50 px-1 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">required</span>
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
-            
-              
-                
+
+
+
+
+
+
+
+
+
+
+
+
+
                   <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20">
                     csvRequired:True
                   </span>
-                
-              
-            
-          
 
-          
 
-          
+
+
+
+
+
+
         </div>
       </td>
     </tr>
 
-    
 
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
 
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <tr class="print:break-inside-avoid-page align-top" id="payments.payment_method">
       <td class="py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6">
         <div class="flex items-start">
           <span style="padding-left: 0.0rem;">
-            
+
           </span>
           <div>
             <a href="#payments.payment_method">
-              
+
               <span class="font-mono">payment_method</span>
             </a>
-            
+
           </div>
         </div>
       </td>
 
       <td class="px-1 py-2 text-sm text-gray-500">
-        
+
           <span
             class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10 mr-1 mb-1"
             title="logicalType: string"
@@ -3522,182 +3522,182 @@ pattern: ^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d\.\d{3}Z$"
             <span>string</span>
             <span class="text-blue-500">ⓘ</span>
           </span>
-        
+
       </td>
 
       <td class="px-3 py-2 text-sm text-gray-500">
-        
+
           <div>Canonical lowercase payment method.</div>
-        
 
-        
 
-        
 
-        
-        
+
+
+
+
+
           <div class="mt-1">
             <span class="text-gray-500">Allowed values</span>
             <ul class="ml-4 list-disc">
-              
+
                 <li>
                   <code class="text-xs">card</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">flouci</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">d17</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">edinar</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">konnect</code>
-                  
-                  
+
+
                 </li>
-              
+
                 <li>
                   <code class="text-xs">bank_transfer</code>
-                  
-                  
+
+
                 </li>
-              
+
             </ul>
           </div>
-        
+
 
         <div class="mt-1 flex gap-x-1 items-center flex-wrap">
-          
 
-          
+
+
             <span class="inline-flex items-center rounded-md bg-gray-50 px-1 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">required</span>
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
-            
-              
-                
+
+
+
+
+
+
+
+
+
+
+
+
+
                   <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20">
                     csvRequired:True
                   </span>
-                
-              
-            
-          
 
-          
 
-          
+
+
+
+
+
+
         </div>
       </td>
     </tr>
 
-    
 
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-    
 
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <tr class="print:break-inside-avoid-page align-top" id="payments.device_id">
       <td class="py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6">
         <div class="flex items-start">
           <span style="padding-left: 0.0rem;">
-            
+
           </span>
           <div>
             <a href="#payments.device_id">
-              
+
               <span class="font-mono">device_id</span>
             </a>
-            
+
           </div>
         </div>
       </td>
 
       <td class="px-1 py-2 text-sm text-gray-500">
-        
+
           <span
             class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10 mr-1 mb-1"
             title="logicalType: string
@@ -3708,105 +3708,105 @@ pattern: ^[^\x00-\x1f\x7f]*$"
             <span>string</span>
             <span class="text-blue-500">ⓘ</span>
           </span>
-        
+
       </td>
 
       <td class="px-3 py-2 text-sm text-gray-500">
-        
+
           <div>Optional device identifier. An empty string means no device was supplied.</div>
-        
 
-        
 
-        
 
-        
-        
+
+
+
+
+
 
         <div class="mt-1 flex gap-x-1 items-center flex-wrap">
-          
 
-          
+
+
             <span class="inline-flex items-center rounded-md bg-gray-50 px-1 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">required</span>
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
+
+
+
+
+
+
+
+
+
+
+
+
         </div>
       </td>
     </tr>
 
-    
 
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
 
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <tr class="print:break-inside-avoid-page align-top" id="payments.reported_scam">
       <td class="py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6">
         <div class="flex items-start">
           <span style="padding-left: 0.0rem;">
-            
+
           </span>
           <div>
             <a href="#payments.reported_scam">
-              
+
               <span class="font-mono">reported_scam</span>
             </a>
-            
+
           </div>
         </div>
       </td>
 
       <td class="px-1 py-2 text-sm text-gray-500">
-        
+
           <span
             class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10 mr-1 mb-1"
             title="logicalType: boolean"
@@ -3814,105 +3814,105 @@ pattern: ^[^\x00-\x1f\x7f]*$"
             <span>boolean</span>
             <span class="text-blue-500">ⓘ</span>
           </span>
-        
+
       </td>
 
       <td class="px-3 py-2 text-sm text-gray-500">
-        
+
           <div>Explicit customer report supplied with the data. Never inferred by the scorer.</div>
-        
 
-        
 
-        
 
-        
-        
+
+
+
+
+
 
         <div class="mt-1 flex gap-x-1 items-center flex-wrap">
-          
 
-          
+
+
             <span class="inline-flex items-center rounded-md bg-gray-50 px-1 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">required</span>
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
+
+
+
+
+
+
+
+
+
+
+
+
         </div>
       </td>
     </tr>
 
-    
 
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
 
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <tr class="print:break-inside-avoid-page align-top" id="payments.expected_fraud">
       <td class="py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6">
         <div class="flex items-start">
           <span style="padding-left: 0.0rem;">
-            
+
           </span>
           <div>
             <a href="#payments.expected_fraud">
-              
+
               <span class="font-mono">expected_fraud</span>
             </a>
-            
+
           </div>
         </div>
       </td>
 
       <td class="px-1 py-2 text-sm text-gray-500">
-        
+
           <span
             class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-600 ring-1 ring-inset ring-blue-500/10 mr-1 mb-1"
             title="logicalType: boolean"
@@ -3920,65 +3920,65 @@ pattern: ^[^\x00-\x1f\x7f]*$"
             <span>boolean</span>
             <span class="text-blue-500">ⓘ</span>
           </span>
-        
+
       </td>
 
       <td class="px-3 py-2 text-sm text-gray-500">
-        
+
           <div>Optional supplied evaluation outcome. Null means unlabeled, not legitimate.</div>
-        
 
-        
 
-        
 
-        
-        
+
+
+
+
+
 
         <div class="mt-1 flex gap-x-1 items-center flex-wrap">
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
 
-          
+
+
+
+
+
+
+
+
+
+
+
+
+
         </div>
       </td>
     </tr>
 
-    
 
-    
-    
-  
-            
+
+
+
+
+
           </tbody>
         </table>
       </div>
     </div>
-  
+
 </section>
 
-          
+
 
 
 
@@ -3991,28 +3991,28 @@ pattern: ^[^\x00-\x1f\x7f]*$"
   </div>
 
   <ul role="list" class="mt-2 divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg">
-    
-      
-      
-      
+
+
+
+
 
       <li class="relative flex flex-col gap-x-6 gap-y-2 px-4 py-3 sm:px-6" id="server-local">
         <div class="flex items-start gap-x-4">
-          
+
             <div class="flex-none h-12 w-12 rounded-lg bg-white p-2.5 ring-1 ring-gray-900/10 flex items-center justify-center self-start">
-              
 
-  
-  
-  
 
-  
+
+
+
+
+
     <svg viewBox="0 0 24 24" class="h-6 w-6 text-emerald-700" fill="none" stroke="currentColor" stroke-width="1.8">
       <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"></path>
     </svg>
-  
+
             </div>
-          
+
 
           <div class="flex-1">
             <div class="flex flex-wrap items-start gap-x-6 gap-y-2">
@@ -4021,91 +4021,91 @@ pattern: ^[^\x00-\x1f\x7f]*$"
                 <div class="mt-1 text-sm text-gray-900">local</div>
               </div>
 
-              
+
                 <div class="flex flex-col">
                   <div class="text-sm font-medium text-gray-500">Type</div>
                   <div class="mt-1 text-sm text-gray-900">local</div>
                 </div>
-              
 
-              
 
-              
 
-              
 
-              
 
-              
+
+
+
+
+
+
                 <div class="flex flex-col">
                   <div class="text-sm font-medium text-gray-500">Path</div>
                   <div class="mt-1 text-sm text-gray-900 break-all">${PAYMENTS_FILE:-data/contract/payments.json}</div>
                 </div>
-              
 
-              
 
-              
 
-              
 
-              
 
-              
 
-              
 
-              
 
-              
 
-              
 
-              
+
+
+
+
+
+
+
+
+
+
+
                 <div class="flex flex-col">
                   <div class="text-sm font-medium text-gray-500">Format</div>
                   <div class="mt-1 text-sm text-gray-900">json</div>
                 </div>
-              
 
-              
 
-              
 
-              
 
-              
 
-              
 
-              
 
-              
 
-              
 
-              
+
+
+
+
+
+
+
+
+
+
             </div>
           </div>
         </div>
       </li>
-    
+
   </ul>
 </section>
 
-          
 
 
 
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
+
   <section id="team">
     <div class="px-4 sm:px-0">
       <h1 class="text-base font-semibold leading-6 text-gray-900" id="team">Team</h1>
@@ -4115,100 +4115,100 @@ pattern: ^[^\x00-\x1f\x7f]*$"
     <div class="mt-2 overflow-hidden shadow sm:rounded-lg bg-white">
       <div class="px-4 py-4 sm:px-6">
 
-        
+
 
         <div class="flex flex-col gap-3">
-          
+
           <div>
             <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Team name</div>
             <div class="mt-1 text-sm text-gray-900">Amastan Fraud Shield</div>
           </div>
-          
 
-          
 
-          
 
-          
 
-          
+
+
+
+
+
           <div>
             <div class="text-sm font-medium text-gray-500 mb-2">Members</div>
             <div>
               <div class="space-y-3">
-                
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
-                  
+
+
+
+
+
+
+
+
+
+
+
+
 
                   <div class="border-l-2 border-gray-200 pl-3 py-1">
                     <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-                      
+
                         <span class="text-gray-900 font-medium">ReguiguiMohamed</span>
-                      
-                      
-                      
+
+
+
                         <span class="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
                           owner
                         </span>
-                      
+
                     </div>
 
-                    
 
-                    
 
-                    
 
-                    
-                    
-                    
+
+
+
+
+
+
                   </div>
-                
+
               </div>
             </div>
           </div>
-          
+
         </div>
       </div>
     </div>
   </section>
-  
-
-          
 
 
 
-  
 
 
 
-          
-
-  
 
 
 
-          
-
-
-          
-
-  
 
 
 
-          
 
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4223,43 +4223,43 @@ pattern: ^[^\x00-\x1f\x7f]*$"
   <div class="mt-2 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg">
     <div class="border-t border-gray-100">
       <dl class="divide-y divide-gray-100 text-sm break-all print:break-inside-avoid">
-        
-          
-            
+
+
+
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-900">
                 maxCsvBytes
-                
-                
+
+
               </dt>
               <dd class="mt-1 break-all text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                
-                  
+
+
                     2000000
-                  
-                
+
+
               </dd>
             </div>
-            
-          
-            
+
+
+
             <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
               <dt class="text-sm font-medium text-gray-900">
                 timestampInputPattern
-                
-                
+
+
               </dt>
               <dd class="mt-1 break-all text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                
-                  
+
+
                     ^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$
-                  
-                
+
+
               </dd>
             </div>
-            
-          
-        
+
+
+
       </dl>
     </div>
   </div>
@@ -4268,7 +4268,7 @@ pattern: ^[^\x00-\x1f\x7f]*$"
         </div>
       </div>
       <div class="mt-6 text-sm text-gray-400">
-        Created at 29 Oct 2026 15:52:51 UTC with <a href="https://cli.datacontract.com" class="text-gray-400 hover:text-gray-500">Data Contract CLI</a> v1.2.8
+        Created at 29 Oct 2026 15:57:04 UTC with <a href="https://cli.datacontract.com" class="text-gray-400 hover:text-gray-500">Data Contract CLI</a> v1.2.8
       </div>
     </div>
   </main>
