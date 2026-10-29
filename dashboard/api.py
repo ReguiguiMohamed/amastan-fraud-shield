@@ -18,7 +18,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from prometheus_client import CONTENT_TYPE_LATEST, CollectorRegistry, Counter, Gauge, Histogram, generate_latest
 from pydantic import BaseModel, StringConstraints
 from sqlalchemy import text
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import DataError, OperationalError
 from starlette.concurrency import run_in_threadpool
 
 from compliance.deadlines import ctaf_filing_deadline
@@ -125,6 +125,8 @@ def get_db_session():
     db = SessionLocal()
     try:
         yield db
+    except (DataError, ValueError):
+        raise HTTPException(status_code=422, detail="Invalid database input") from None
     except OperationalError:
         _database_status = "unavailable"
         _database_checked_at = _time.time()

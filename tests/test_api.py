@@ -153,6 +153,23 @@ class TestHealthEndpoint:
         assert response.json() == {"detail": "Database temporarily unavailable"}
         session.close.assert_called_once()
 
+    def test_invalid_postgresql_text_returns_422(self, api_test_client, analyst_headers, monkeypatch):
+        from unittest.mock import Mock
+
+        import dashboard.api as api_module
+
+        session = Mock()
+        session.execute.side_effect = ValueError("A string literal cannot contain NUL (0x00) characters.")
+        monkeypatch.setattr(api_module, "SessionLocal", lambda: session)
+        response = api_test_client.post(
+            "/api/v1/feedback/",
+            json={"transaction_id": "bad\u0000id", "analyst_label": "False Positive"},
+            headers=analyst_headers,
+        )
+        assert response.status_code == 422
+        assert response.json() == {"detail": "Invalid database input"}
+        session.close.assert_called_once()
+
 
 class TestAuthEndpoints:
     def test_whoami_admin(self, api_test_client, admin_headers):
