@@ -204,7 +204,14 @@ export function parseCSV(text, papa = globalThis.Papa) {
 export function networkElements(rows) {
   const accounts = new Set(rows.flatMap((r) => [r.user_id, r.recipient_id]));
   return [
-    ...Array.from(accounts, (id) => ({ data: { id: `a:${id}`, label: id } })),
+    ...Array.from(accounts, (id) => ({
+      data: {
+        id: `a:${id}`,
+        label: id,
+        display_label:
+          id.length > 12 ? `${id.slice(0, 4)}…${id.slice(-4)}` : id,
+      },
+    })),
     ...rows.map((r) => ({
       data: {
         id: `t:${r.transaction_id}`,

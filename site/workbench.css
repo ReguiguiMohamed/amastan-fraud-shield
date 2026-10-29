@@ -604,7 +604,14 @@ tbody tr:hover td {
   line-height: 1.7;
   color: var(--muted);
 }
+.case-panel {
+  max-height: 760px;
+  overflow-y: auto;
+}
 .case-top {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   background: #203b37;
   color: #fff;
   padding: 23px 22px;
@@ -979,6 +986,7 @@ footer a:hover {
   }
   .case-panel {
     grid-column: 1/-1;
+    max-height: none;
   }
   .case-body {
     display: grid;
@@ -1154,6 +1162,8 @@ footer a:hover {
   .case-panel {
     border: 0;
     display: block !important;
+    max-height: none;
+    overflow: visible;
   }
   .case-top {
     color: #000;

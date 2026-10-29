@@ -362,7 +362,7 @@ function renderGraph() {
         selector: "node",
         style: {
           "background-color": "#a3b8ac",
-          label: "data(label)",
+          label: "data(display_label)",
           "font-size": 8,
           "font-family": "JetBrains Mono, monospace",
           color: "#31453a",
