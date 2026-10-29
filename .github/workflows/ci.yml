@@ -41,6 +41,11 @@ jobs:
       - name: Compile maintained Python modules
         run: python -m compileall -q src dashboard scripts
 
+      - name: Verify the investigation desk
+        run: |
+          node --check site/workbench.js
+          node --test site/tests/*.test.mjs
+
       - name: Audit workflows
         env:
           GH_TOKEN: ${{ github.token }}
@@ -173,6 +178,31 @@ jobs:
 
       - name: Fail on high-severity findings
         run: bandit -r src dashboard scripts -lll
+
+  browser:
+    name: Investigation desk browser checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install pinned browser test tools
+        run: |
+          npm ci --prefix site --ignore-scripts
+          site/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Test desktop, mobile and workspace recovery
+        run: site/node_modules/.bin/playwright test --config site/playwright.config.js
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: investigation-desk-browser-evidence
+          path: site/test-results/
+          if-no-files-found: error
 
   docker-build:
     name: Docker image builds

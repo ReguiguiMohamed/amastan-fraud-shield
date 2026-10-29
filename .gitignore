@@ -26,3 +26,8 @@ backtest-report.json
 
 # Local planning notes
 CHECKPOINT.md
+
+# Browser verification
+site/node_modules/
+site/test-results/
+site/playwright-report/

@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Follow connected payments, inspect explainable signals and build a reviewable case. A local investigation desk for Tunisian payment fraud."
+    />
+    <title>Investigation desk · Amastan Fraud Shield</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="workbench.css" />
+    <script defer src="vendor/papaparse.min.js"></script>
+    <script defer src="vendor/cytoscape.min.js"></script>
+    <script type="module" src="workbench.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#queue">Skip to payments</a>
+    <header class="topbar">
+      <a class="brand" href="index.html"
+        ><svg viewBox="0 0 32 36" aria-hidden="true">
+          <path d="M16 2 29 7v10c0 8-6 13-13 17C9 30 3 25 3 17V7Z" />
+          <path d="M6 19h6l3-8 4 15 3-7h5" /></svg
+        ><span
+          >amastan<span class="brand-sub"
+            >FRAUD SHIELD / INVESTIGATION DESK</span
+          ></span
+        ></a
+      >
+      <nav class="tabs" aria-label="Workspace view">
+        <button data-view="desk" aria-pressed="true">Investigate</button
+        ><button data-view="lab" aria-pressed="false">Rule lab</button
+        ><button data-view="method" aria-pressed="false">Field notes</button>
+      </nav>
+      <span class="local-pill"><i></i> Local analysis</span>
+    </header>
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">
+            THE ANALYST'S WORKSPACE <span>02 / OCT 2026</span>
+          </p>
+          <h1>See the pattern.<br /><em>Build the case.</em></h1>
+          <p class="intro-copy">
+            One payment is a clue. The connections tell the story.
+          </p>
+        </div>
+        <div class="intro-actions">
+          <div class="action-row">
+            <label class="button primary" for="import-file"
+              >Open CSV or workspace <span aria-hidden="true">↗</span></label
+            ><input
+              id="import-file"
+              type="file"
+              accept=".csv,.json,text/csv,application/json"
+              class="file-input"
+            /><button id="sample" class="button">Sample CSV ↓</button>
+          </div>
+          <p>
+            Transactions stay in your browser. No account, API key or database
+            required.
+          </p>
+          <div class="action-row">
+            <button id="export-workspace" class="text-button">
+              Export workspace</button
+            ><button id="save-device" class="text-button">
+              Save on this device</button
+            ><button id="forget-device" class="text-button" hidden>
+              Remove saved copy</button
+            ><span id="saved-state"></span>
+          </div>
+        </div>
+      </section>
+      <div
+        id="notice"
+        class="notice"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></div>
+      <section class="scenarios" aria-label="Synthetic investigation scenarios">
+        <div class="section-label">
+          START WITH A STORY <span>Synthetic data</span>
+        </div>
+        <div id="scenario-list" class="scenario-list"></div>
+        <p id="scenario-story" class="scenario-story"></p>
+      </section>
+      <section id="view-desk" class="view">
+        <div class="stats" id="stats" aria-label="Batch summary"></div>
+        <div class="workspace">
+          <section class="panel queue" id="queue" tabindex="-1">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">01 / TRIAGE</p>
+                <h2>Payment queue <span id="queue-count"></span></h2>
+              </div>
+              <button id="export-csv" class="text-button">Export CSV ↓</button>
+            </div>
+            <div class="filters">
+              <label class="search-label"
+                ><span class="sr"
+                  >Search accounts, recipients or transaction IDs</span
+                ><input
+                  id="search"
+                  type="search"
+                  placeholder="Find an account or payment…"
+                  autocomplete="off" /></label
+              ><label
+                ><span class="sr">Filter payments</span
+                ><select id="filter">
+                  <option value="review">Needs review</option>
+                  <option value="all">All payments</option>
+                  <option value="pending">Awaiting decision</option>
+                  <option value="confirmed">Confirmed fraud</option>
+                  <option value="cleared">Cleared</option>
+                  <option value="needs_info">Needs context</option>
+                </select></label
+              >
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Payment / sender</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">
+                      <button
+                        id="sort-priority"
+                        aria-label="Toggle priority sort order"
+                      >
+                        Priority ↓
+                      </button>
+                    </th>
+                    <th scope="col">Review</th>
+                  </tr>
+                </thead>
+                <tbody id="payments"></tbody>
+              </table>
+              <p id="empty" class="empty" hidden>
+                No payments match. Try all payments or clear the search.
+              </p>
+            </div>
+            <div class="panel-foot">
+              <span>Priority is a triage order, not a fraud probability.</span
+              ><span id="queue-position"></span>
+            </div>
+          </section>
+          <section class="panel network-panel">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">02 / CONNECTIONS</p>
+                <h2>Follow the money</h2>
+              </div>
+              <button id="graph-fit" class="text-button">Fit</button>
+            </div>
+            <div class="graph-legend">
+              <span><i class="dot red"></i>Selected sender</span
+              ><span><i class="dot blue"></i>Recipient</span
+              ><span><i class="dot gray"></i>Connected account</span>
+            </div>
+            <div
+              id="network"
+              role="img"
+              aria-label="Interactive account network. The payment queue provides a keyboard-accessible list of the same relationships."
+            ></div>
+            <div class="graph-caption">
+              <strong id="graph-caption"></strong>
+              <p>
+                Arrows follow the payment direction. Select an account to find
+                its payments. Drag to explore, scroll to zoom.
+              </p>
+              <button id="graph-reset" class="text-button">
+                Clear account filter</button
+              ><button id="graph-export" class="text-button">
+                Save graph PNG ↓
+              </button>
+            </div>
+            <div class="signal-key">
+              <p class="eyebrow">LOOK FOR THE CONNECTION</p>
+              <h3>Small amounts can tell a bigger story.</h3>
+              <p>
+                Shared beneficiaries, reused devices and circular transfers add
+                context beyond the amount of a single payment.
+              </p>
+            </div>
+          </section>
+          <aside class="panel case-panel" aria-label="Selected case">
+            <div id="case-detail"></div>
+          </aside>
+        </div>
+      </section>
+      <section id="view-lab" class="view" hidden>
+        <div class="lab-grid">
+          <section class="panel lab-control">
+            <p class="eyebrow">CONTROLLED EXPERIMENT</p>
+            <h2>What changes when<br /><em>you move the line?</em></h2>
+            <p>
+              Adjust the base-rule threshold and compare review volume on this
+              batch. Network signals continue to raise a review independently.
+            </p>
+            <label class="threshold-label" for="threshold"
+              >Base-rule threshold
+              <output id="threshold-value">0.50</output></label
+            ><input
+              id="threshold"
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              value="50"
+            />
+            <div class="range-labels">
+              <span>More reviews</span><span>Fewer reviews</span>
+            </div>
+            <button id="reset-threshold" class="button">Reset to 0.50</button>
+            <p class="small">
+              The rule uses score &gt; threshold. A score of exactly 0.50 does
+              not cross a 0.50 threshold.
+            </p>
+            <div id="lab-metrics" class="lab-metrics"></div>
+          </section>
+          <section class="panel lab-chart">
+            <p class="eyebrow">THE SHAPE OF THIS BATCH</p>
+            <h2>Score distribution</h2>
+            <div
+              id="histogram"
+              class="histogram"
+              aria-label="Base risk score distribution"
+            ></div>
+            <div class="range-labels">
+              <span>0.00</span><span>0.50</span><span>1.00</span>
+            </div>
+            <div id="benchmark" class="benchmark"></div>
+          </section>
+        </div>
+        <section class="panel rule-reference">
+          <p class="eyebrow">EXPLAINABLE BY DESIGN</p>
+          <h2>Every point has a reason.</h2>
+          <div id="rule-reference"></div>
+          <p class="small">
+            These are prototype review controls. They are not legal payment
+            limits or a validated fraud model. The same base rules run in the
+            original payment demo and the Python backtest.
+          </p>
+        </section>
+      </section>
+      <section id="view-method" class="view" hidden>
+        <div class="method-grid">
+          <article class="panel">
+            <p class="eyebrow">RESEARCH / OCTOBER 2026</p>
+            <h2>Designed around<br /><em>the investigation.</em></h2>
+            <p>
+              A shared account can link otherwise ordinary payments. A customer
+              report can matter even when a payment was authorised. These recent
+              sources informed the synthetic stories and the signals you can
+              inspect.
+            </p>
+            <a
+              class="source"
+              href="https://www.fca.org.uk/publications/multi-firm-reviews/money-mules-activity-cashing-out-findings"
+              target="_blank"
+              rel="noopener"
+              ><time>23 SEP 2026</time
+              ><strong>Money mules: activity and cashing out</strong
+              ><span
+                >FCA · recurring accounts and criminal infrastructure ↗</span
+              ></a
+            ><a
+              class="source"
+              href="https://digital-strategy.ec.europa.eu/en/library/digital-services-act-study-financial-scams-online-platforms-and-ways-counter-them"
+              target="_blank"
+              rel="noopener"
+              ><time>20 OCT 2026</time
+              ><strong>Financial scams on online platforms</strong
+              ><span
+                >European Commission · scam typologies and mitigation ↗</span
+              ></a
+            ><a
+              class="source"
+              href="https://www.eba.europa.eu/publications-and-media/press-releases/joint-eba-ecb-report-payment-fraud-strong-authentication-remains-effective-fraudsters-are-adapting"
+              target="_blank"
+              rel="noopener"
+              ><time>15 DEC 2025</time><strong>Payment fraud is adapting</strong
+              ><span
+                >EBA / ECB · manipulation of payers alongside authentication
+                ↗</span
+              ></a
+            >
+            <p class="small">
+              These sources describe other jurisdictions. They do not establish
+              Tunisian regulatory requirements, prove that a payment is
+              fraudulent, or validate the thresholds in this demo.
+            </p>
+          </article>
+          <article class="panel">
+            <p class="eyebrow">HOW TO READ THE SIGNALS</p>
+            <h2>A review signal.<br /><em>A human decision.</em></h2>
+            <dl id="method-signals"></dl>
+            <p>
+              Velocity, governorate diversity, fan-in, fan-out and similar
+              amounts use the preceding 30 minutes, including the current
+              payment. Shared devices and circular transfers use the complete
+              batch. Graph findings are retrospective.
+            </p>
+            <p>
+              Scenario labels are fictional ground truth. Metrics calculated
+              from those labels describe only this batch. Imported transactions
+              can optionally include <code>expected_fraud</code>; unlabeled
+              imports do not show precision or recall.
+            </p>
+          </article>
+          <article class="panel">
+            <p class="eyebrow">OPEN SOURCE / LOCAL FIRST</p>
+            <h2>Tools you can inspect.</h2>
+            <p>
+              <a href="https://js.cytoscape.org/">Cytoscape.js 3.34.4</a>
+              renders the interactive account graph. Amastan finds circular
+              account groups using an iterative graph traversal.
+              <a href="https://www.papaparse.com/">Papa Parse 5.7.0</a> handles
+              CSV quoting, delimiters and spreadsheet-safe exports. Both use the
+              MIT license and are bundled locally.
+            </p>
+            <p>
+              Case decisions and notes remain in memory until you export a
+              workspace or choose Save on this device. Saved copies use browser
+              storage on this device and can be removed here.
+            </p>
+            <p>
+              Evidence exports include a SHA-256 digest of the sorted JSON
+              payload. The digest checks file integrity. It does not certify the
+              data's origin, the analyst's identity or regulatory compliance.
+            </p>
+            <a
+              href="https://github.com/ReguiguiMohamed/amastan-fraud-shield/blob/main/docs/INVESTIGATION_DESK.md"
+              >Read the data contract and verification notes ↗</a
+            >
+          </article>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>AMASTAN / INVESTIGATION DESK</span
+      ><span id="data-origin">Synthetic scenario · October 29, 2026</span
+      ><a href="index.html">Payment demo ↗</a
+      ><a href="https://github.com/ReguiguiMohamed/amastan-fraud-shield"
+        >Source code ↗</a
+      >
+    </footer>
+  </body>
+</html>

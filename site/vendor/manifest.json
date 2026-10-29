@@ -1,0 +1,18 @@
+[
+  {
+    "name": "cytoscape",
+    "version": "3.34.4",
+    "license": "MIT",
+    "tarball": "https://registry.npmjs.org/cytoscape/-/cytoscape-3.34.4.tgz",
+    "integrity": "sha512-msY99tMY8iWTg+sIPGfSqDcPNOt4xcj+v/K/7qUFaCUxxlqnMkUYLBjRUzn9W5CU/R2hrmtJa5+UtovrEM2ctg==",
+    "sha256": "081591ab735b2b6a3b31a3c60f8f3a3e2fee8c92939e0c7820ad1208571b6cd8"
+  },
+  {
+    "name": "papaparse",
+    "version": "5.7.0",
+    "license": "MIT",
+    "tarball": "https://registry.npmjs.org/papaparse/-/papaparse-5.7.0.tgz",
+    "integrity": "sha512-qBGxg/7Q3Kl9Wfhrz2Z74UnvnHTXLNG6jmKJFeBvP2+y4lV7So+7SR62+Zd47JvdrCkX+nDcnr0ObPzek/+6RA==",
+    "sha256": "4d5d2d6e3282b66aafaa5e6de8ca3ae06f8d3440111ae99c6a30f6c00cfac33e"
+  }
+]
