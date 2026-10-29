@@ -57,6 +57,8 @@ a { color: inherit; }
 .brand { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--ink); color: var(--card); }
 .brand svg { width: 22px; height: 22px; }
 .guide { display: flex; align-items: center; gap: 16px; }
+.desk-launch { display: inline-flex; gap: 12px; align-items: center; background: var(--ink); color: var(--card); text-decoration: none; padding: 12px 17px; border-radius: 8px; font: 500 12px var(--display); margin: 0 0 22px; }
+.desk-launch span { font: 10px var(--mono); color: #afc6b5; }
 .steps { display: flex; gap: 8px; }
 .steps i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: background .3s, box-shadow .3s; }
 .steps i.done { background: var(--ink); }
@@ -295,6 +297,7 @@ a { color: inherit; }
     </div>
   </header>
 
+  <a class="desk-launch" href="workbench.html"><span>NEW / 02</span> Open the investigation desk ↗</a>
   <p class="lead" id="lead"></p>
 
   <main>

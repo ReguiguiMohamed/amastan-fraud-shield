@@ -1,6 +1,21 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 - 2026-10-29
+
+- Added a browser investigation desk with six synthetic case studies, local
+  CSV analysis, account networks, review decisions and connected timelines.
+- Added 30-minute context signals, shared-device and circular-transfer
+  findings, a threshold lab and evaluation against supplied labels.
+- Added case evidence and workspace exports with SHA-256 integrity checks,
+  printable case briefs, optional browser storage and safe CSV exports.
+- Bundled MIT-licensed Cytoscape.js 3.34.4 and Papa Parse 5.7.0 with licenses
+  and verified integrity values.
+- Added browser checks and screenshots, plus tests for 5,000-payment batches,
+  import validation, graph analysis and file integrity.
+- Removed database queries from idle Prometheus scrapes. Database outages
+  return 503 while the Space stays available and retries access on demand.
+- Added protected daily readiness checks and deployment revision verification.
+- PostgreSQL input errors return schema-conformant validation responses.
 
 - Interactive demo site on GitHub Pages. It scores payments with the same
   rules as the API and shows live CI, deploy and Space status.

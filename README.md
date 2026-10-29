@@ -31,8 +31,9 @@ Two bearer tokens split the work. The admin token ingests alerts and exports
 cases, and the analyst token reads the queue and submits feedback. The same
 code runs on SQLite locally and on Neon PostgreSQL in the hosted demo.
 
-> [!NOTE]
-> The project is finished and in maintenance mode.
+The browser [investigation desk](https://reguiguimohamed.github.io/amastan-fraud-shield/workbench.html)
+analyzes local payment batches, connects accounts and records case decisions.
+It works while the hosted database is unavailable. Its scenarios are synthetic.
 
 ## How it works
 
@@ -64,6 +65,11 @@ The [demo site](https://reguiguimohamed.github.io/amastan-fraud-shield/)
 scores a payment with the API's rules, raises an alert above the threshold and
 shows the CTAF filing deadline. It also shows live CI, deploy and Space status.
 `test_site_rules_match_python` keeps its rules equal to the Python ones.
+
+The [investigation desk](https://reguiguimohamed.github.io/amastan-fraud-shield/workbench.html)
+adds six case studies, CSV imports, linked-account graphs, analyst notes,
+threshold experiments and case exports with integrity digests. See the
+[investigation guide](docs/INVESTIGATION_DESK.md) for its data contract and limits.
 
 ## Proof
 

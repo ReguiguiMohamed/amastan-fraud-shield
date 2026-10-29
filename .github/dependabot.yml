@@ -1,5 +1,16 @@
 version: 2
 updates:
+  - package-ecosystem: "npm"
+    directory: "/site"
+    schedule:
+      interval: "weekly"
+    labels: []
+    cooldown:
+      default-days: 14
+    groups:
+      browser-tests:
+        update-types: ["minor", "patch"]
+
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
