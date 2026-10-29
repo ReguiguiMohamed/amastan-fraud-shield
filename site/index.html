@@ -680,6 +680,10 @@ async function live() {
     if (stage === "RUNNING") {
       const health = await json(`${SPACE_HOST}/health/`).catch(() => null);
       if (health?.version) node.querySelector(".v").innerHTML = `<b>${stage}</b><span>v${health.version}</span>`;
+      if (health?.database_status === "unavailable") {
+        setStatus(node, "fail");
+        node.querySelector(".v").textContent = "DATABASE UNAVAILABLE";
+      }
     }
   }
 }

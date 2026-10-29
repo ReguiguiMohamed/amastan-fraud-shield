@@ -17,6 +17,13 @@ Authorization: Bearer <token>
 `ADMIN_TOKEN` has full access. `ANALYST_TOKEN` can read alerts and submit
 feedback. `/health/` and `/docs` are public. `/metrics` uses `METRICS_TOKEN`.
 
+`/health/` reports process liveness and cached database status without querying
+the database. `/ready/` checks database readiness and accepts an admin,
+analyst or readiness-only `HEALTHCHECK_TOKEN`. It returns 503 when PostgreSQL
+is unavailable. Database operations also return 503 with `Retry-After: 60`
+during connection outages. See [deployment](DEPLOYMENT.md) for monitoring
+and free-tier recovery.
+
 ## Alerts
 
 ### `POST /api/v1/alerts/add/`

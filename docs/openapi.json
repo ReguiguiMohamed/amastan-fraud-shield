@@ -52,6 +52,9 @@
           "403": {
             "description": "Token lacks the required role"
           },
+          "503": {
+            "description": "Database temporarily unavailable"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -121,6 +124,9 @@
           "403": {
             "description": "Token lacks the required role"
           },
+          "503": {
+            "description": "Database temporarily unavailable"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -189,6 +195,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           },
           "422": {
             "description": "Validation Error",
@@ -260,6 +269,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           },
           "422": {
             "description": "Validation Error",
@@ -348,6 +360,9 @@
           "403": {
             "description": "Token lacks the required role"
           },
+          "503": {
+            "description": "Database temporarily unavailable"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -383,6 +398,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           }
         },
         "security": [
@@ -437,6 +455,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           },
           "422": {
             "description": "Validation Error",
@@ -497,6 +518,9 @@
           "403": {
             "description": "Token lacks the required role"
           },
+          "503": {
+            "description": "Database temporarily unavailable"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -542,6 +566,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           },
           "422": {
             "description": "Validation Error",
@@ -607,6 +634,9 @@
           "403": {
             "description": "Token lacks the required role"
           },
+          "503": {
+            "description": "Database temporarily unavailable"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -658,6 +688,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           },
           "404": {
             "description": "Transaction not found"
@@ -713,6 +746,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           },
           "404": {
             "description": "Transaction not found"
@@ -788,6 +824,9 @@
           "403": {
             "description": "Token lacks the required role"
           },
+          "503": {
+            "description": "Database temporarily unavailable"
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -823,6 +862,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           }
         },
         "security": [
@@ -854,6 +896,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           }
         },
         "security": [
@@ -885,6 +930,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           }
         },
         "security": [
@@ -916,6 +964,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           }
         },
         "security": [
@@ -947,6 +998,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           }
         },
         "security": [
@@ -978,6 +1032,9 @@
           },
           "403": {
             "description": "Token lacks the required role"
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
           }
         },
         "security": [
@@ -1002,6 +1059,31 @@
             }
           }
         }
+      }
+    },
+    "/ready/": {
+      "get": {
+        "summary": "Readiness Check",
+        "description": "Check database readiness on demand; routine scrapes use /metrics instead.",
+        "operationId": "readiness_check_ready__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "503": {
+            "description": "Database temporarily unavailable"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/health/": {

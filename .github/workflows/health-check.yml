@@ -22,6 +22,7 @@ jobs:
     timeout-minutes: 10
     env:
       HEALTH_PATH: ${{ inputs.path || '/health/' }}
+      HEALTHCHECK_TOKEN: ${{ secrets.HEALTHCHECK_TOKEN }}
     steps:
       - name: Request the API unless the Space sleeps
         run: |
@@ -35,3 +36,11 @@ jobs:
           esac
           # curl doubles the wait after each failed try, from 1 s up to 16 s.
           curl -fsS --retry 5 --retry-all-errors "https://mohamedreg-amastan-fraud-shield-api.hf.space$HEALTH_PATH"
+          if [ -z "$HEALTHCHECK_TOKEN" ]; then
+            echo "HEALTHCHECK_TOKEN must be configured to check database readiness."
+            exit 1
+          fi
+          # One database probe per day permits scale-to-zero between real requests.
+          curl -fsS --connect-timeout 10 --max-time 45 \
+            -H "Authorization: Bearer $HEALTHCHECK_TOKEN" \
+            https://mohamedreg-amastan-fraud-shield-api.hf.space/ready/

@@ -36,9 +36,8 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           if [ -z "$HF_TOKEN" ]; then
-            echo "HF_TOKEN secret not set. Skipping deploy."
-            echo "To enable: add HF_TOKEN to GitHub repo secrets (Settings > Secrets and variables > Actions)"
-            exit 0
+            echo "HF_TOKEN secret must be set to deploy."
+            exit 1
           fi
 
           SPACE_NAME="MohamedReg/amastan-fraud-shield-api"
@@ -72,6 +71,7 @@ jobs:
           cp "$GITHUB_WORKSPACE/requirements.txt" .
           cp -r "$GITHUB_WORKSPACE/dashboard" ./dashboard/
           cp -r "$GITHUB_WORKSPACE/src" ./src/
+          printf '%s' "$GITHUB_SHA" > src/shared/deployment-revision.txt
 
           git add -A
 
@@ -91,15 +91,20 @@ jobs:
       - name: Wait for the Space build
         if: steps.push.outputs.pushed == 'true'
         run: |
-          building=0
           for _ in $(seq 1 90); do
             sleep 10
-            stage=$(curl -fsS https://huggingface.co/api/spaces/MohamedReg/amastan-fraud-shield-api | jq -r .runtime.stage) || stage=unreachable
+            info=$(curl -fsS --connect-timeout 10 --max-time 30 https://huggingface.co/api/spaces/MohamedReg/amastan-fraud-shield-api) || continue
+            stage=$(echo "$info" | jq -r .runtime.stage)
             echo "$stage"
             case "$stage" in
-              *BUILDING|*APP_STARTING) building=1 ;;
-              RUNNING) [ "$building" = 1 ] && exit 0 ;;
-              *ERROR) [ "$building" = 1 ] && exit 1 ;;
+              RUNNING)
+                health=$(curl -fsS --connect-timeout 10 --max-time 30 https://mohamedreg-amastan-fraud-shield-api.hf.space/health/) || continue
+                if [ "$(echo "$health" | jq -r .revision)" = "$GITHUB_SHA" ]; then
+                  echo "$health"
+                  exit 0
+                fi
+                ;;
+              *ERROR) echo "$info" | jq -r .runtime.errorMessage; exit 1 ;;
             esac
           done
           exit 1
