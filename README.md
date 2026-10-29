@@ -83,6 +83,7 @@ The dashboard export is [`docs/grafana-dashboard.json`](docs/grafana-dashboard.j
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/health/` | Health and version |
+| `GET` | `/ready/` | Authenticated database readiness |
 | `POST` | `/api/v1/alerts/add/` | Store an alert |
 | `GET` | `/api/v1/alerts/review-queue/` | Read the review queue |
 | `POST` | `/api/v1/feedback/` | Record analyst feedback |

@@ -3,10 +3,12 @@ import hashlib
 import json
 import logging
 import os
+import threading
 import time as _time
 from collections import defaultdict
 from contextlib import asynccontextmanager, contextmanager
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Annotated, Any, Dict, List, Literal, Optional
 
 from fastapi import APIRouter, Depends, FastAPI, Header, HTTPException, Query, Request, Response
@@ -16,6 +18,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from prometheus_client import CONTENT_TYPE_LATEST, CollectorRegistry, Counter, Gauge, Histogram, generate_latest
 from pydantic import BaseModel, StringConstraints
 from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
+from starlette.concurrency import run_in_threadpool
 
 from compliance.deadlines import ctaf_filing_deadline
 from dashboard.monitoring import ForensicAnalyticEngine
@@ -34,6 +38,7 @@ security = HTTPBearer(auto_error=False)
 ANALYST_TOKEN = os.getenv("ANALYST_TOKEN")
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN")
 METRICS_TOKEN = os.getenv("METRICS_TOKEN")
+HEALTHCHECK_TOKEN = os.getenv("HEALTHCHECK_TOKEN")
 METRICS_ALLOW_PUBLIC = os.getenv("METRICS_ALLOW_PUBLIC", "").lower() in {"1", "true", "yes"}
 
 if not ANALYST_TOKEN:
@@ -43,6 +48,7 @@ if not ADMIN_TOKEN:
 
 ANALYST_TOKEN_HASH = hashlib.sha256(ANALYST_TOKEN.encode()).hexdigest()
 ADMIN_TOKEN_HASH = hashlib.sha256(ADMIN_TOKEN.encode()).hexdigest()
+HEALTHCHECK_TOKEN_HASH = hashlib.sha256(HEALTHCHECK_TOKEN.encode()).hexdigest() if HEALTHCHECK_TOKEN else None
 
 
 def require_scopes(scopes):
@@ -60,6 +66,8 @@ def require_scopes(scopes):
             role = "admin"
         elif token_hash == ANALYST_TOKEN_HASH:
             role = "analyst"
+        elif token_hash == HEALTHCHECK_TOKEN_HASH:
+            role = "healthcheck"
         else:
             raise HTTPException(status_code=401, detail="Unauthorized")
         if role not in scopes:
@@ -69,18 +77,61 @@ def require_scopes(scopes):
     return verifier
 
 
-# Database setup
-# The app uses shared.database.SessionLocal for all DB operations
-# which connects to either local SQLite or a remote Postgres URL.
-# The prototype creates its schema through SQLAlchemy at startup.
+_database_lock = threading.Lock()
+_database_initialized = False
+_database_retry_at = 0.0
+_database_status = "unchecked"
+_database_checked_at = 0.0
+_database_metrics_refresh_at = 0.0
+
+
+def check_database():
+    global _database_initialized, _database_retry_at, _database_status, _database_checked_at
+    with _database_lock:
+        if _time.monotonic() < _database_retry_at:
+            raise HTTPException(
+                status_code=503, detail="Database temporarily unavailable", headers={"Retry-After": "60"}
+            )
+        try:
+            if not _database_initialized:
+                Base.metadata.create_all(bind=engine)
+                _database_initialized = True
+            with engine.connect() as connection:
+                connection.execute(text("SELECT 1"))
+        except OperationalError:
+            _database_status = "unavailable"
+            _database_retry_at = _time.monotonic() + 60
+            db_metrics_scrape_success.set(0)
+            logger.warning("Database unavailable; retrying on demand after 60 seconds")
+            raise HTTPException(
+                status_code=503, detail="Database temporarily unavailable", headers={"Retry-After": "60"}
+            ) from None
+        else:
+            _database_status = "available"
+        finally:
+            _database_checked_at = _time.time()
+
+
+async def require_database(request: Request, auth=Depends(require_scopes({"analyst", "admin"}))):
+    await run_in_threadpool(check_database)
+    request.state.database_used = True
 
 
 @contextmanager
 def get_db_session():
     """Context manager for SQLAlchemy database sessions."""
+    global _database_status, _database_retry_at, _database_checked_at
     db = SessionLocal()
     try:
         yield db
+    except OperationalError:
+        _database_status = "unavailable"
+        _database_checked_at = _time.time()
+        _database_retry_at = _time.monotonic() + 60
+        db_metrics_scrape_success.set(0)
+        raise HTTPException(
+            status_code=503, detail="Database temporarily unavailable", headers={"Retry-After": "60"}
+        ) from None
     finally:
         db.close()
 
@@ -130,7 +181,7 @@ def metrics_path_label(request: Request) -> str:
         return "api_v1_unmatched"
     if path.startswith("/api/v1/"):
         return path
-    if path in {"/", "/health/", "/metrics", "/docs", "/openapi.json"}:
+    if path in {"/", "/health/", "/ready/", "/metrics", "/docs", "/openapi.json"}:
         return path
     return "unmatched"
 
@@ -145,7 +196,7 @@ def require_metrics_token(request: Request):
 
 def refresh_database_metrics():
     try:
-        with get_db_session() as db:
+        with SessionLocal() as db:
             alert_rows = db.execute(
                 text(
                     """
@@ -184,6 +235,7 @@ def refresh_database_metrics():
             model_champion_f1.set(0.0)
             model_champion_auc.set(0.0)
         db_metrics_scrape_success.set(1)
+        db_metrics_refreshed_at.set(_time.time())
     except Exception:
         db_metrics_scrape_success.set(0)
         logger.exception("Unable to refresh database metrics")
@@ -243,7 +295,12 @@ db_review_queue_total = Gauge(
 )
 db_metrics_scrape_success = Gauge(
     "amastan_db_metrics_scrape_success",
-    "Whether the latest metrics scrape could read the SQLAlchemy database.",
+    "Whether the latest database readiness check or metrics refresh succeeded.",
+    registry=prometheus_registry,
+)
+db_metrics_refreshed_at = Gauge(
+    "amastan_db_metrics_refreshed_timestamp_seconds",
+    "Unix timestamp of the last successful database metrics refresh; zero before the first refresh.",
     registry=prometheus_registry,
 )
 model_champion_f1 = Gauge(
@@ -433,8 +490,12 @@ RATE_LIMIT_WINDOW = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 @asynccontextmanager
 async def lifespan(_application: FastAPI):
     logger.info("Starting Fraud Detection Command Center API")
-    Base.metadata.create_all(bind=engine)
+    try:
+        await run_in_threadpool(check_database)
+    except HTTPException:
+        logger.warning("Starting in degraded mode; database access will recover on the next successful readiness check")
     yield
+    engine.dispose()
     logger.info("Fraud Detection Command Center API shut down")
 
 
@@ -459,6 +520,7 @@ app.add_middleware(
 # --- Rate Limiting Middleware ---
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
+    global _database_metrics_refresh_at
     client_ip = request.client.host if request.client else "unknown"
     now = _time.time()
     start_time = _time.perf_counter()
@@ -505,6 +567,14 @@ async def rate_limit_middleware(request: Request, call_next):
         path=path_label,
     ).observe(elapsed)
     monitoring_engine.record_inference_latency(elapsed * 1000)
+    # Refresh only during real database traffic so idle Prometheus scrapes cannot wake Neon.
+    if (
+        response.status_code < 400
+        and getattr(request.state, "database_used", False)
+        and _time.monotonic() >= _database_metrics_refresh_at
+    ):
+        _database_metrics_refresh_at = _time.monotonic() + 60
+        await run_in_threadpool(refresh_database_metrics)
     return response
 
 
@@ -514,7 +584,12 @@ async def rate_limit_middleware(request: Request, call_next):
 router = APIRouter(
     prefix="/api/v1",
     tags=["v1"],
-    responses={401: {"description": "Missing or unknown token"}, 403: {"description": "Token lacks the required role"}},
+    dependencies=[Depends(require_database)],
+    responses={
+        401: {"description": "Missing or unknown token"},
+        403: {"description": "Token lacks the required role"},
+        503: {"description": "Database temporarily unavailable"},
+    },
 )
 
 
@@ -606,6 +681,8 @@ async def submit_feedback(
                 "stats": "/api/v1/stats/",
             },
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -670,6 +747,8 @@ async def submit_batch_feedback(
             )
             log_audit_event("ALERT", item.transaction_id, "CLASSIFY", user_id or "unknown", previous_state, new_state)
             results.append({"transaction_id": item.transaction_id, "status": "success"})
+        except HTTPException:
+            raise
         except Exception as e:
             results.append({"transaction_id": item.transaction_id, "status": "error", "detail": str(e)})
 
@@ -726,6 +805,8 @@ async def get_high_risk_alerts(
             )
         db_readback_total.labels(endpoint="alerts_high_risk", result="success").inc()
         return alerts
+    except HTTPException:
+        raise
     except Exception as e:
         db_readback_total.labels(endpoint="alerts_high_risk", result="error").inc()
         raise HTTPException(status_code=500, detail=str(e))
@@ -773,6 +854,8 @@ async def get_review_queue(
                 }
             )
         return alerts
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -788,6 +871,8 @@ async def list_branches(auth=Depends(require_scopes({"analyst", "admin"}))):
                 )
             ).fetchall()
         return [row[0] for row in rows]
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -937,6 +1022,8 @@ async def get_system_stats(branch_id: Optional[str] = None, auth=Depends(require
                 "branches": "/api/v1/branches/",
             },
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1106,6 +1193,8 @@ async def get_compliance_kpis(branch_id: Optional[str] = None, auth=Depends(requ
             "generated_at": now.isoformat(),
             "basis": "Recorded alerts, generated SAR text, analyst feedback, and sanctions alerts.",
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1159,6 +1248,8 @@ async def add_high_risk_alert(alert: TransactionAlert, auth=Depends(require_scop
 
         alerts_ingested_total.labels(alert_type=alert_type, result="success").inc()
         return {"status": "success", "message": "Alert added successfully"}
+    except HTTPException:
+        raise
     except Exception as e:
         alerts_ingested_total.labels(alert_type=alert.alert_type or "high_risk", result="error").inc()
         raise HTTPException(status_code=500, detail=str(e))
@@ -1262,6 +1353,8 @@ async def get_model_performance(branch_id: Optional[str] = None, auth=Depends(re
             "warning": "Estimated recall assumes random samples represent low-risk traffic.",
             "interpretation": "Precision reflects alert performance; recall is sampling-adjusted.",
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1485,6 +1578,8 @@ async def export_ctaf(
                 "review_queue": "/api/v1/alerts/review-queue/",
             },
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1533,6 +1628,8 @@ async def get_retraining_summary(auth=Depends(require_scopes({"analyst", "admin"
         repo = ModelRepository()
         summary = repo.get_champion_training_status()
         return {"status": "available", **summary}
+    except HTTPException:
+        raise
     except Exception as e:
         return {"status": "unavailable", "detail": str(e)}
 
@@ -1560,18 +1657,29 @@ async def root_status():
 async def prometheus_metrics(request: Request):
     """Prometheus/OpenMetrics endpoint for Grafana Cloud Metrics Endpoint scraping."""
     require_metrics_token(request)
-    refresh_database_metrics()
     return Response(content=generate_latest(prometheus_registry), media_type=CONTENT_TYPE_LATEST)
+
+
+@app.get("/ready/", responses={503: {"description": "Database temporarily unavailable"}})
+async def readiness_check(auth=Depends(require_scopes({"analyst", "admin", "healthcheck"}))):
+    """Check database readiness on demand; routine scrapes use /metrics instead."""
+    await run_in_threadpool(check_database)
+    db_metrics_scrape_success.set(1)
+    return {"status": "ready", "database": "available"}
 
 
 @app.get("/health/")
 async def health_check():
     """Health check endpoint for the API (always at root, not versioned)"""
+    revision_file = Path(__file__).resolve().parents[1] / "src/shared/deployment-revision.txt"
     return {
         "status": "healthy",
         "service": "fraud-detection-command-center-api",
         "version": __version__,
         "release_channel": RELEASE_CHANNEL,
+        "database_status": _database_status,
+        "database_checked_at": _database_checked_at,
+        "revision": revision_file.read_text().strip() if revision_file.exists() else "local",
     }
 
 

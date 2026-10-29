@@ -63,6 +63,8 @@ class TestHealthEndpoint:
         assert authorized.status_code == 200
 
     def test_prometheus_metrics_read_champion_registry(self, api_test_client, tmp_db):
+        import dashboard.api as api_module
+
         with sqlite3.connect(tmp_db) as conn:
             conn.execute(
                 """
@@ -73,12 +75,83 @@ class TestHealthEndpoint:
                 ("prototype-v1", "models/prototype-v1", 0.81, 0.91, 1, datetime.now().isoformat()),
             )
 
+        api_module.refresh_database_metrics()
         response = api_test_client.get("/metrics")
 
         assert response.status_code == 200
         assert "amastan_model_champion_f1_score 0.81" in response.text
         assert "amastan_model_champion_auc 0.91" in response.text
         assert 'amastan_model_champion_info{version_id="prototype-v1"} 1.0' in response.text
+
+    def test_monitoring_never_opens_database_connections(self, api_test_client, monkeypatch):
+        import dashboard.api as api_module
+
+        def unexpected_connection(*args, **kwargs):
+            pytest.fail("Routine monitoring must not connect to Neon")
+
+        monkeypatch.setattr(api_module.engine, "connect", unexpected_connection)
+        monkeypatch.setattr(api_module, "SessionLocal", unexpected_connection)
+        for _ in range(5):
+            assert api_test_client.get("/health/").status_code == 200
+            assert api_test_client.get("/metrics").status_code == 200
+
+    def test_database_outage_does_not_crash_startup_and_recovers(self, api_test_client, monkeypatch):
+        from unittest.mock import Mock
+
+        from fastapi.testclient import TestClient
+        from sqlalchemy.exc import OperationalError
+
+        import dashboard.api as api_module
+
+        real_connect = api_module.engine.connect
+        failure = OperationalError("SELECT 1", {}, Exception("quota exceeded private-host password"))
+        connect = Mock(side_effect=failure)
+        monkeypatch.setattr(api_module.engine, "connect", connect)
+        with TestClient(api_module.app) as client:
+            assert client.get("/health/").json()["database_status"] == "unavailable"
+            assert client.get("/docs").status_code == 200
+            assert client.get("/metrics").status_code == 200
+            assert client.get("/ready/").status_code == 401
+            headers = {"Authorization": "Bearer test_admin_token"}
+            for path in ("/ready/", "/api/v1/alerts/review-queue/", "/api/v1/stats/"):
+                response = client.get(path, headers=headers)
+                assert response.status_code == 503
+                assert response.headers["Retry-After"] == "60"
+                assert "private-host" not in response.text
+                assert "password" not in response.text
+            assert connect.call_count == 1
+
+            monkeypatch.setattr(api_module.engine, "connect", real_connect)
+            monkeypatch.setattr(api_module, "_database_retry_at", 0)
+            assert client.get("/ready/", headers=headers).status_code == 200
+            assert client.get("/api/v1/alerts/review-queue/", headers=headers).status_code == 200
+            assert client.get("/health/").json()["database_status"] == "available"
+
+    def test_readiness_token_cannot_access_alerts(self, api_test_client, monkeypatch):
+        import hashlib
+
+        import dashboard.api as api_module
+
+        monkeypatch.setattr(api_module, "HEALTHCHECK_TOKEN_HASH", hashlib.sha256(b"health-only").hexdigest())
+        headers = {"Authorization": "Bearer health-only"}
+        assert api_test_client.get("/ready/", headers=headers).status_code == 200
+        assert api_test_client.get("/api/v1/alerts/review-queue/", headers=headers).status_code == 403
+
+    def test_database_outage_during_request_returns_503(self, api_test_client, admin_headers, monkeypatch):
+        from unittest.mock import Mock
+
+        from sqlalchemy.exc import OperationalError
+
+        import dashboard.api as api_module
+
+        monkeypatch.setattr(api_module, "check_database", lambda: None)
+        session = Mock()
+        session.execute.side_effect = OperationalError("SELECT 1", {}, Exception("private-host password"))
+        monkeypatch.setattr(api_module, "SessionLocal", lambda: session)
+        response = api_test_client.get("/api/v1/alerts/review-queue/", headers=admin_headers)
+        assert response.status_code == 503
+        assert response.json() == {"detail": "Database temporarily unavailable"}
+        session.close.assert_called_once()
 
 
 class TestAuthEndpoints:

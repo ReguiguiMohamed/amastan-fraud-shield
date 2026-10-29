@@ -34,6 +34,8 @@ if DATABASE_URL.startswith("sqlite"):
         Path(database_path).parent.mkdir(parents=True, exist_ok=True)
     connect_args = {"check_same_thread": False}
     engine_kwargs = {}
+else:
+    connect_args = {"connect_timeout": 10, "options": "-c statement_timeout=15000"}
 
 # SQLAlchemy 2.1 maps a bare postgresql:// URL to psycopg 3. Neon hands out that form and the image ships psycopg2.
 url = make_url(DATABASE_URL)
