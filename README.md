@@ -34,6 +34,8 @@ code runs on SQLite locally and on Neon PostgreSQL in the hosted demo.
 The browser [investigation desk](https://reguiguimohamed.github.io/amastan-fraud-shield/workbench.html)
 analyzes local payment batches, connects accounts and records case decisions.
 It works while the hosted database is unavailable. Its scenarios are synthetic.
+Its [ODCS payment contract](site/contracts/README.md) supplies browser import
+constraints and runs through Data Contract CLI in CI.
 
 ## How it works
 

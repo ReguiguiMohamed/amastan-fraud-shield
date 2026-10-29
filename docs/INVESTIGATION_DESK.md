@@ -19,30 +19,20 @@ cover a mule collection network, rapid wallet payments, repeated similar
 amounts, customer-reported scams and an ordinary-payment control group.
 Every identifier, label and payment in these stories is synthetic.
 
-## CSV contract
+## Data contract
 
 CSV imports accept up to 5,000 rows and 2 MB. Papa Parse handles quoted
 fields, BOM headers and comma, semicolon or tab delimiters. The desk rejects
 malformed files, duplicate headers, duplicate transaction IDs and invalid
 rows before replacing the current batch.
 
-| Required column | Accepted value |
-| --- | --- |
-| `transaction_id` | Unique string, 1–80 printable characters |
-| `user_id` | Sender account string, 1–80 printable characters |
-| `recipient_id` | Recipient account string, using the same account namespace as `user_id` |
-| `amount_tnd` | Positive decimal, at most 3 fractional digits and 100,000,000 TND |
-| `timestamp` | ISO 8601 date and time with seconds and an explicit timezone |
-| `governorate` | One of Tunisia's 24 governorates, case-insensitive |
-| `payment_method` | `card`, `flouci`, `d17`, `edinar`, `konnect` or `bank_transfer` |
+The [ODCS payment contract](../site/contracts/README.md) owns normalized field
+constraints and accepted values. The browser imports its limits from generated
+contract metadata. Data Contract CLI checks normalized synthetic batches in CI
+with DuckDB, including deliberately invalid inputs.
 
-| Optional column | Purpose |
-| --- | --- |
-| `device_id` | Printable device identifier for detecting account reuse |
-| `reported_scam` | `true` or `false`, recording an explicit customer report |
-| `expected_fraud` | `true` or `false`, supplied outcome for batch evaluation. Blank values remain unlabeled. |
-
-Identifiers keep their leading zeros. Amount totals use integer millimes.
+Field notes links to the YAML, native CLI documentation and JSON Schema.
+Export payment records for CLI downloads the normalized array for local checks.
 The sample CSV is generated from the same synthetic data as the desk.
 
 ## Scoring and graph context
@@ -89,10 +79,12 @@ copy deletes that browser copy while leaving the current session open.
 Storage limits and private-browsing policies can prevent saving. The desk
 reports those failures and supports a workspace export instead.
 
-A workspace JSON export contains normalized source transactions, decisions,
+A workspace JSON export contains the payment contract ID and version,
+normalized source transactions, decisions,
 threshold and source description. Import verifies its integrity digest and
 validates its contents before restoring it. JSON workspace imports are
-limited to 20 MB. A case export contains the selected payment, signals,
+limited to 20 MB. A case export contains the contract ID and version,
+the selected payment, signals,
 analyst decision, connected payments and rule settings. Print case brief
 uses the selected case and recorded note, excluding draft notes.
 

@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="workbench.css" />
@@ -42,12 +42,10 @@
     <main>
       <section class="intro">
         <div>
-          <p class="eyebrow">
-            THE ANALYST'S WORKSPACE <span>02 / OCT 2026</span>
-          </p>
-          <h1>See the pattern.<br /><em>Build the case.</em></h1>
+          <p class="eyebrow">TUNISIAN PAYMENTS / LOCAL REVIEW</p>
+          <h1>Investigation desk</h1>
           <p class="intro-copy">
-            One payment is a clue. The connections tell the story.
+            Review payments, trace connected accounts and record a decision.
           </p>
         </div>
         <div class="intro-actions">
@@ -85,7 +83,7 @@
       ></div>
       <section class="scenarios" aria-label="Synthetic investigation scenarios">
         <div class="section-label">
-          START WITH A STORY <span>Synthetic data</span>
+          DEMO SCENARIOS <span>Fictional accounts and payments</span>
         </div>
         <div id="scenario-list" class="scenario-list"></div>
         <p id="scenario-story" class="scenario-story"></p>
@@ -96,7 +94,7 @@
           <section class="panel queue" id="queue" tabindex="-1">
             <div class="panel-head">
               <div>
-                <p class="eyebrow">01 / TRIAGE</p>
+                <p class="eyebrow">TRIAGE</p>
                 <h2>Payment queue <span id="queue-count"></span></h2>
               </div>
               <button id="export-csv" class="text-button">Export CSV ↓</button>
@@ -153,7 +151,7 @@
           <section class="panel network-panel">
             <div class="panel-head">
               <div>
-                <p class="eyebrow">02 / CONNECTIONS</p>
+                <p class="eyebrow">ACCOUNT NETWORK</p>
                 <h2>Follow the money</h2>
               </div>
               <button id="graph-fit" class="text-button">Fit</button>
@@ -180,14 +178,6 @@
                 Save graph PNG ↓
               </button>
             </div>
-            <div class="signal-key">
-              <p class="eyebrow">LOOK FOR THE CONNECTION</p>
-              <h3>Small amounts can tell a bigger story.</h3>
-              <p>
-                Shared beneficiaries, reused devices and circular transfers add
-                context beyond the amount of a single payment.
-              </p>
-            </div>
           </section>
           <aside class="panel case-panel" aria-label="Selected case">
             <div id="case-detail"></div>
@@ -198,7 +188,7 @@
         <div class="lab-grid">
           <section class="panel lab-control">
             <p class="eyebrow">CONTROLLED EXPERIMENT</p>
-            <h2>What changes when<br /><em>you move the line?</em></h2>
+            <h2>Test the review threshold</h2>
             <p>
               Adjust the base-rule threshold and compare review volume on this
               batch. Network signals continue to raise a review independently.
@@ -239,8 +229,8 @@
           </section>
         </div>
         <section class="panel rule-reference">
-          <p class="eyebrow">EXPLAINABLE BY DESIGN</p>
-          <h2>Every point has a reason.</h2>
+          <p class="eyebrow">BASE RULES</p>
+          <h2>Score contributions</h2>
           <div id="rule-reference"></div>
           <p class="small">
             These are prototype review controls. They are not legal payment
@@ -253,7 +243,7 @@
         <div class="method-grid">
           <article class="panel">
             <p class="eyebrow">RESEARCH / OCTOBER 2026</p>
-            <h2>Designed around<br /><em>the investigation.</em></h2>
+            <h2>Research behind the scenarios</h2>
             <p>
               A shared account can link otherwise ordinary payments. A customer
               report can matter even when a payment was authorised. These recent
@@ -299,7 +289,7 @@
           </article>
           <article class="panel">
             <p class="eyebrow">HOW TO READ THE SIGNALS</p>
-            <h2>A review signal.<br /><em>A human decision.</em></h2>
+            <h2>How to interpret a signal</h2>
             <dl id="method-signals"></dl>
             <p>
               Velocity, governorate diversity, fan-in, fan-out and similar
@@ -325,6 +315,21 @@
               CSV quoting, delimiters and spreadsheet-safe exports. Both use the
               MIT license and are bundled locally.
             </p>
+            <h3>Versioned payment contract</h3>
+            <p id="contract-summary"></p>
+            <p>
+              <a href="contracts/payments.html" target="_blank" rel="noopener"
+                >Read the contract ↗</a
+              >
+              ·
+              <a href="contracts/payments.odcs.yaml" download>ODCS YAML ↓</a> ·
+              <a href="contracts/payments.schema.json" download
+                >JSON Schema ↓</a
+              >
+            </p>
+            <button id="export-payments" class="text-button">
+              Export payment records for CLI ↓
+            </button>
             <p>
               Case decisions and notes remain in memory until you export a
               workspace or choose Save on this device. Saved copies use browser

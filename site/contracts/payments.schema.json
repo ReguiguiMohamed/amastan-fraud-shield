@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "transaction_id": {
+      "type": "string",
+      "primaryKey": true,
+      "pattern": "^[^\\x00-\\x1f\\x7f]*$",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Unique payment identifier within this batch. Leading zeros are significant."
+    },
+    "user_id": {
+      "type": "string",
+      "pattern": "^[^\\x00-\\x1f\\x7f]*$",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Sender account identifier, in the same namespace as recipient_id."
+    },
+    "recipient_id": {
+      "type": "string",
+      "pattern": "^[^\\x00-\\x1f\\x7f]*$",
+      "minLength": 1,
+      "maxLength": 80,
+      "description": "Recipient account identifier. It need not appear as a sender in this batch."
+    },
+    "amount_tnd": {
+      "type": "number",
+      "description": "Positive payment amount in Tunisian dinars, to three decimal places.",
+      "minimum": 0.001,
+      "maximum": 100000000
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d\\.\\d{3}Z$",
+      "description": "Payment event time normalized to UTC, for example 2026-10-29T09:00:00.000Z."
+    },
+    "governorate": {
+      "type": "string",
+      "enum": [
+        "Tunis",
+        "Ariana",
+        "Ben Arous",
+        "Manouba",
+        "Bizerte",
+        "Nabeul",
+        "Zaghouan",
+        "B\u00e9ja",
+        "Jendouba",
+        "Le Kef",
+        "Siliana",
+        "Sousse",
+        "Monastir",
+        "Mahdia",
+        "Kairouan",
+        "Kasserine",
+        "Sidi Bouzid",
+        "Sfax",
+        "Gafsa",
+        "Tozeur",
+        "K\u00e9bili",
+        "Gab\u00e8s",
+        "M\u00e9denine",
+        "Tataouine"
+      ],
+      "description": "Canonical Tunisian governorate name. Raw imports accept case-insensitive names."
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "card",
+        "flouci",
+        "d17",
+        "edinar",
+        "konnect",
+        "bank_transfer"
+      ],
+      "description": "Canonical lowercase payment method."
+    },
+    "device_id": {
+      "type": "string",
+      "pattern": "^[^\\x00-\\x1f\\x7f]*$",
+      "minLength": 0,
+      "maxLength": 80,
+      "description": "Optional device identifier. An empty string means no device was supplied."
+    },
+    "reported_scam": {
+      "type": "boolean",
+      "description": "Explicit customer report supplied with the data. Never inferred by the scorer."
+    },
+    "expected_fraud": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Optional supplied evaluation outcome. Null means unlabeled, not legitimate."
+    }
+  },
+  "required": [
+    "transaction_id",
+    "user_id",
+    "recipient_id",
+    "amount_tnd",
+    "timestamp",
+    "governorate",
+    "payment_method",
+    "device_id",
+    "reported_scam"
+  ],
+  "description": "CSV input is normalized before crossing this boundary. All ten fields are materialized. Optional device identifiers default to an empty string, reported_scam defaults to false and missing evaluation labels remain null. Timestamps are UTC with millisecond precision. No arrival-order or freshness guarantee applies to user-supplied historical batches."
+}

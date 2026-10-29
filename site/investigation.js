@@ -1,43 +1,20 @@
 import { score, WEIGHTS, ALERT } from "./rules.js";
+import { PAYMENT_CONTRACT } from "./contracts/payment-contract.js";
 
-export const MAX_ROWS = 5000;
-export const MAX_BYTES = 2_000_000;
+export const MAX_ROWS = PAYMENT_CONTRACT.maxRows;
+export const MAX_BYTES = PAYMENT_CONTRACT.maxCsvBytes;
 export const WINDOW_MS = 30 * 60 * 1000;
-export const REQUIRED = [
-  "transaction_id",
-  "user_id",
-  "recipient_id",
-  "amount_tnd",
-  "timestamp",
-  "governorate",
-  "payment_method",
-];
-export const GOVERNORATES = [
-  "Tunis",
-  "Ariana",
-  "Ben Arous",
-  "Manouba",
-  "Bizerte",
-  "Nabeul",
-  "Zaghouan",
-  "Béja",
-  "Jendouba",
-  "Le Kef",
-  "Siliana",
-  "Sousse",
-  "Monastir",
-  "Mahdia",
-  "Kairouan",
-  "Kasserine",
-  "Sidi Bouzid",
-  "Sfax",
-  "Gafsa",
-  "Tozeur",
-  "Kébili",
-  "Gabès",
-  "Médenine",
-  "Tataouine",
-];
+export const REQUIRED = PAYMENT_CONTRACT.requiredColumns;
+export const GOVERNORATES = PAYMENT_CONTRACT.governorates;
+const identifierPattern = new RegExp(PAYMENT_CONTRACT.identifier.pattern, "u");
+const timestampInputPattern = new RegExp(
+  PAYMENT_CONTRACT.timestampInputPattern,
+);
+const money = PAYMENT_CONTRACT.amount;
+const moneyScale = 10 ** money.decimalPlaces;
+const moneyInputPattern = new RegExp(
+  `^\\d+(?:\\.\\d{1,${money.decimalPlaces}})?$`,
+);
 export const RULE_NAMES = {
   velocity: "More than 3 payments in 30 minutes",
   travel: "Multiple governorates in 30 minutes",
@@ -82,11 +59,13 @@ function identifier(value, name, optional = false) {
     throw new Error(`${name} must be a string`);
   const text = String(value ?? "").trim();
   if (
-    (!optional && !text) ||
-    text.length > 80 ||
-    /[\u0000-\u001f\u007f]/u.test(text)
+    (!optional && text.length < PAYMENT_CONTRACT.identifier.minLength) ||
+    text.length > PAYMENT_CONTRACT.identifier.maxLength ||
+    !identifierPattern.test(text)
   )
-    throw new Error(`${name} must contain 1–80 printable characters`);
+    throw new Error(
+      `${name} must contain printable characters, up to ${PAYMENT_CONTRACT.identifier.maxLength}`,
+    );
   return text;
 }
 
@@ -101,10 +80,12 @@ function boolean(value, name, optional = false) {
 export function normalizeRows(records) {
   if (
     !Array.isArray(records) ||
-    records.length < 1 ||
+    records.length < PAYMENT_CONTRACT.minRows ||
     records.length > MAX_ROWS
   )
-    throw new Error(`Provide 1–${MAX_ROWS.toLocaleString()} transactions`);
+    throw new Error(
+      `Provide ${PAYMENT_CONTRACT.minRows}–${MAX_ROWS.toLocaleString()} transactions`,
+    );
   const ids = new Set();
   return records.map((raw, index) => {
     try {
@@ -123,20 +104,18 @@ export function normalizeRows(records) {
       if (
         !["number", "string"].includes(typeof raw.amount_tnd) ||
         (typeof raw.amount_tnd === "string" &&
-          !/^\d+(?:\.\d{1,3})?$/.test(raw.amount_tnd.trim())) ||
+          !moneyInputPattern.test(raw.amount_tnd.trim())) ||
         !Number.isFinite(amount) ||
-        amount <= 0 ||
-        amount > 100_000_000 ||
-        Math.abs(amount * 1000 - Math.round(amount * 1000)) > 0.0001
+        amount < money.minimum ||
+        amount > money.maximum ||
+        Math.abs(amount * moneyScale - Math.round(amount * moneyScale)) > 0.0001
       )
         throw new Error(
-          "amount_tnd must be positive, at most 100,000,000 and have at most 3 decimal places",
+          `amount_tnd must be at least ${money.minimum}, at most ${money.maximum} and have at most ${money.decimalPlaces} decimal places`,
         );
       const timestamp = String(raw.timestamp ?? "");
       if (
-        !/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(
-          timestamp,
-        ) ||
+        !timestampInputPattern.test(timestamp) ||
         !Number.isFinite(Date.parse(timestamp))
       )
         throw new Error(
@@ -153,20 +132,11 @@ export function normalizeRows(records) {
       const payment_method = String(raw.payment_method ?? "")
         .trim()
         .toLowerCase();
-      if (
-        ![
-          "card",
-          "flouci",
-          "d17",
-          "edinar",
-          "konnect",
-          "bank_transfer",
-        ].includes(payment_method)
-      )
+      if (!PAYMENT_CONTRACT.paymentMethods.includes(payment_method))
         throw new Error("Unknown payment_method");
       return {
         ...row,
-        amount_tnd: Math.round(amount * 1000) / 1000,
+        amount_tnd: Math.round(amount * moneyScale) / moneyScale,
         timestamp: new Date(timestamp).toISOString(),
         governorate,
         payment_method,

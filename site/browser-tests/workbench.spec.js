@@ -14,6 +14,7 @@ test("desktop investigation, graph, decisions, rule lab and research", async ({
   await expect(page.locator("#payments tr")).toHaveCount(14);
   await expect(page.locator("#network canvas").first()).toBeVisible();
   await expect(page.locator("#notice.error")).toHaveCount(0);
+  expect((await page.locator("#queue").boundingBox()).y).toBeLessThan(550);
   await page.screenshot({
     path: testInfo.outputPath("desk-desktop.png"),
     fullPage: true,
@@ -61,13 +62,11 @@ test("CSV import, safe rendering, evidence integrity and workspace round trip", 
   const sampleDownload = page.waitForEvent("download");
   await page.getByRole("button", { name: "Sample CSV", exact: false }).click();
   const sample = await readFile(await (await sampleDownload).path());
-  await page
-    .locator("#import-file")
-    .setInputFiles({
-      name: "sample.csv",
-      mimeType: "text/csv",
-      buffer: sample,
-    });
+  await page.locator("#import-file").setInputFiles({
+    name: "sample.csv",
+    mimeType: "text/csv",
+    buffer: sample,
+  });
   await page.locator("#search").fill("REPORT-3");
   await page
     .getByRole("button", { name: "Inspect REPORT-3", exact: true })
@@ -102,6 +101,10 @@ test("CSV import, safe rendering, evidence integrity and workspace round trip", 
     createHash("sha256").update(canonicalJSON(caseFile.payload)).digest("hex"),
   );
   expect(caseFile.payload.analyst_review.verdict).toBe("confirmed");
+  expect(caseFile.payload.data_contract).toEqual({
+    id: "urn:amastan:payments:normalized:v1",
+    version: "1.0.0",
+  });
   const workspaceDownload = page.waitForEvent("download");
   await page
     .getByRole("button", { name: "Export workspace", exact: true })
@@ -110,6 +113,7 @@ test("CSV import, safe rendering, evidence integrity and workspace round trip", 
     await (await workspaceDownload).path(),
     "utf8",
   );
+  expect(JSON.parse(workspace).payload.data_contract.version).toBe("1.0.0");
   await page.getByRole("button", { name: /A quiet morning/ }).click();
   await expect(page.locator("#payments tr")).toHaveCount(0);
   await page.locator("#import-file").setInputFiles({
@@ -146,7 +150,7 @@ test("mobile layout and original-demo entry point", async ({
   await page.goto("/index.html");
   await page.getByRole("link", { name: /Open the investigation desk/ }).click();
   await expect(
-    page.getByRole("heading", { name: /See the pattern/ }),
+    page.getByRole("heading", { name: "Investigation desk", exact: true }),
   ).toBeVisible();
   await expect(page.locator("#payments tr")).toHaveCount(14);
   expect(
@@ -170,4 +174,46 @@ test("mobile layout and original-demo entry point", async ({
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+
+test("payment contract documentation and normalized record export", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/workbench.html");
+  await page.getByRole("button", { name: "Field notes", exact: true }).click();
+  await expect(page.locator("#contract-summary")).toContainText(
+    "Payment contract 1.0.0 · ODCS v3.2.0",
+  );
+  const contractPage = page.waitForEvent("popup");
+  await page
+    .getByRole("link", { name: "Read the contract", exact: false })
+    .click();
+  const documentation = await contractPage;
+  await expect(
+    documentation
+      .getByRole("heading", {
+        name: "Amastan normalized payment batch",
+        exact: true,
+      })
+      .first(),
+  ).toBeVisible();
+  await documentation.close();
+  const download = page.waitForEvent("download");
+  await page
+    .getByRole("button", { name: /Export payment records for CLI/ })
+    .click();
+  const records = JSON.parse(
+    await readFile(await (await download).path(), "utf8"),
+  );
+  expect(records).toHaveLength(32);
+  expect(Object.keys(records[0])).toHaveLength(10);
+  expect(records[0].timestamp).toMatch(/\.\d{3}Z$/);
+  expect(typeof records[0].reported_scam).toBe("boolean");
+  const schema = await page.request.get("/contracts/payments.schema.json");
+  expect(schema.ok()).toBe(true);
+  expect((await schema.json()).properties.amount_tnd.minimum).toBe(0.001);
+  await page.screenshot({
+    path: testInfo.outputPath("payment-contract.png"),
+    fullPage: true,
+  });
 });
