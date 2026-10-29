@@ -108,6 +108,7 @@ def check_database():
             ) from None
         else:
             _database_status = "available"
+            db_metrics_scrape_success.set(1)
         finally:
             _database_checked_at = _time.time()
 
@@ -1664,7 +1665,6 @@ async def prometheus_metrics(request: Request):
 async def readiness_check(auth=Depends(require_scopes({"analyst", "admin", "healthcheck"}))):
     """Check database readiness on demand; routine scrapes use /metrics instead."""
     await run_in_threadpool(check_database)
-    db_metrics_scrape_success.set(1)
     return {"status": "ready", "database": "available"}
 
 
