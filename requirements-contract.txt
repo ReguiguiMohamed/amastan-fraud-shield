@@ -1,1 +1,1 @@
-datacontract-cli[duckdb]==1.2.8
+datacontract-cli[duckdb]==1.2.9
